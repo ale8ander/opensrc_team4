@@ -1,0 +1,23 @@
+blank_issues_enabled: false
+
+issue_templates:
+  - name: Bug Report (English)
+    description: Report a bug in English
+    file: ISSUE_TEMPLATE/bug_report_en.md
+  - name: Bug Report (Korean)
+    description: Report a bug in Korean
+    file: ISSUE_TEMPLATE/bug_report_kr.md
+  - name: Feature Request (English)
+    description: Suggest a new feature or improvement
+    file: ISSUE_TEMPLATE/feature_request_en.md
+  - name: Feature Request (Korean)
+    description: 새로운 기능 또는 개선 사항을 제안합니다
+    file: ISSUE_TEMPLATE/feature_request_kr.md
+
+pull_request_templates:
+  - name: Default PR Template
+    description: Default template for pull requests
+    file: PULL_REQUEST_TEMPLATE/PULL_REQUEST_TEMPLATE.md
+  - name: English PR Template
+    description: PR template in English
+    file: PULL_REQUEST_TEMPLATE/PULL_REQUEST_TEMPLATE_en.md
