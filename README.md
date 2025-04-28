@@ -4,9 +4,9 @@
 
 <div align="center">
 
-| **Dongsoo Ko** | **Jooyoung Lee** | **Hyeeun Yang** |
+| **Dongsu Ko** | **Jooyoung Lee** | **Hyeeun Yang** |
 |:--------------:|:----------------:|:---------------:|
-| [<img src="https://avatars.githubusercontent.com/u/127917642?v=4" height=150 width=150> <br/> @kdongsu5509](https://github.com/kdongsu5509) | [<img src="https://avatars.githubusercontent.com/u/103786350?v=4" height=150 width=150> <br/> @ale8ander](https://github.com/ale8ander) | [<img src="https://avatars.githubusercontent.com/u/171621595?v=4" height=150 width=150> <br/> @EunHu-00](https://github.com/EunHu-00) |
+| [@kdongsu5509](https://github.com/kdongsu5509) | [@ale8ander](https://github.com/ale8ander) | [@EunHu-00](https://github.com/EunHu-00) |
 
 </div>
 
