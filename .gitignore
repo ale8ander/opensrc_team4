@@ -1,0 +1,78 @@
+# Miscellaneous
+*.class
+*.log
+*.pyc
+*.swp
+.DS_Store
+.atom/
+.buildlog/
+.history
+.svn/
+.swiftpm/
+migrate_working_dir/
+
+# IntelliJ / IDEA
+*.iml
+*.ipr
+*.iws
+.idea/
+
+# VSCode (필요시 주석 해제)
+/.vscode/
+
+# Flutter / Dart / Pub 관련
+front_app/.dart_tool/
+front_app/.flutter-plugins
+front_app/.flutter-plugins-dependencies
+front_app/.packages
+front_app/.pub-cache/
+front_app/.pub/
+front_app/build/
+front_app/doc/api/
+
+# iOS 관련
+front_app/ios/Flutter/
+front_app/ios/Pods/
+front_app/ios/.symlinks/
+front_app/ios/Runner.xcworkspace/
+front_app/ios/Runner.xcodeproj/project.xcworkspace/
+front_app/ios/Runner.xcodeproj/xcshareddata/
+DerivedData/
+*.xcuserstate
+*.xcworkspace
+*.xcodeproj/project.xcworkspace/
+
+# Android 관련
+front_app/android/.gradle/
+front_app/android/captures/
+front_app/android/local.properties
+front_app/android/.idea/
+front_app/android/app/debug/
+front_app/android/app/profile/
+front_app/android/app/release/
+.gradle/
+gradle/
+**/gradle-wrapper.jar
+**/gradlew
+**/gradlew.bat
+
+# 앱 심볼, 난독화 관련
+app.*.symbols
+app.*.map.json
+
+# 테스트 / 커버리지
+front_app/coverage/
+front_app/test/*.log
+
+# front_computer, recognition 모듈
+front_computer/.dart_tool/
+front_computer/build/
+front_computer/.idea/
+front_computer/.packages
+front_computer/*.iml
+
+recognition/.dart_tool/
+recognition/build/
+recognition/.idea/
+recognition/.packages
+recognition/*.iml
