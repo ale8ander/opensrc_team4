@@ -1,0 +1,20 @@
+name: Auto Assign PR to Specific Members
+
+on:
+  pull_request:
+    types: [opened]
+
+jobs:
+  auto-assign:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Assign PR to Specific Members
+        uses: actions/github-script@v7
+        with:
+          script: |
+            github.rest.issues.addAssignees({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              issue_number: context.issue.number,
+              assignees: ['kdongsu5509', 'ale8ander', 'EunHu-00']
+            })
