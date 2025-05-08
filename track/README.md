@@ -6,20 +6,19 @@
 - 부가 기능: emojis 출력
 
 ### configuration (차후 Docker에 넣기)
-'''
+```
 pip install mediapipe opencv-python numpy
-'''
- You should use Python 3.7~3.11
+```
+- You should use Python 3.7~3.11
 
 ### structure
 
-get_hand_center: 손 중심 좌표 계산 함수
-window가 꺼질 때까지 해당 함수 무한 반복
-
-emojis 출력 관련 함수: classify_hand_pose, overlay_png
+- get_hand_center: 손 중심 좌표 계산 함수
+- emojis 출력 관련 함수: classify_hand_pose, overlay_png
+- window가 꺼질 때까지 해당 함수 무한 반복
 
 ### Quit
-'q' key or just close window
+- 'q' key or just close window
 
 ### Problem
 - GUI issue: 창닫기 버튼 비활성화(OpenCV-Macbook 호환 문제)
