@@ -5,6 +5,7 @@ import os
 import time
 from collections import deque
 
+
 # 스와이프 인식 클래스
 class SwipeRecognizer:
     def __init__(self, cooldown=2.0, movement_threshold=0.1, stability_threshold=0.01):
@@ -39,21 +40,21 @@ class SwipeRecognizer:
         self.prev_avg_x = avg_x
         return gesture
 
-# MediaPipe 초기화
-mp_hands = mp.solutions.hands
-hands = mp_hands.Hands(max_num_hands=1, min_detection_confidence=0.7)
-mp_drawing = mp.solutions.drawing_utils
+    def get_cooldown_remaining(self):
+        return max(0.0, self.cooldown - (time.time() - self.last_swipe_time))
 
-# 이모지 설정 
+
+# 이모지 설정
 emoji_img_paths = {
     "Swipe Right": "emojis/swipe_right.png",
     "Swipe Left": "emojis/swipe_left.png",
     "Fist": "emojis/fist.png",
     "Open Hand": "emojis/open_hand.png",
-    "Victory": "emojis/victory.png"
+    "Victory": "emojis/victory.png",
 }
 
-# 손 모양 제스처 분류 함수 
+
+# 손 모양 제스처 분류 함수
 def classify_hand_pose(landmarks):
     finger_tips = [8, 12, 16, 20]
     finger_pips = [6, 10, 14, 18]
@@ -69,13 +70,18 @@ def classify_hand_pose(landmarks):
         return "Fist"
     elif extended >= 4:
         return "Open Hand"
-    elif landmarks[8].y < landmarks[6].y and landmarks[12].y < landmarks[10].y \
-         and landmarks[16].y > landmarks[14].y and landmarks[20].y > landmarks[18].y:
+    elif (
+        landmarks[8].y < landmarks[6].y
+        and landmarks[12].y < landmarks[10].y
+        and landmarks[16].y > landmarks[14].y
+        and landmarks[20].y > landmarks[18].y
+    ):
         return "Victory"
     else:
         return None
 
-# PNG 이미지 오버레이 함수
+
+# 손제스처 관련: PNG 이미지 오버레이 함수
 def overlay_png(background, overlay, x, y):
     h, w = overlay.shape[:2]
     if y + h > background.shape[0] or x + w > background.shape[1]:
@@ -85,79 +91,114 @@ def overlay_png(background, overlay, x, y):
     alpha_background = 1.0 - alpha_overlay
 
     for c in range(0, 3):
-        background[y:y+h, x:x+w, c] = (
-            alpha_overlay * overlay[:, :, c] + alpha_background * background[y:y+h, x:x+w, c]
+        background[y : y + h, x : x + w, c] = (
+            alpha_overlay * overlay[:, :, c]
+            + alpha_background * background[y : y + h, x : x + w, c]
         )
     return background
 
-# 실행 시작
-cap = cv2.VideoCapture(0)
-cv2.namedWindow("Hand Gesture Tracking", cv2.WINDOW_NORMAL)
 
-trajectory = deque(maxlen=10)
-swipe_recognizer = SwipeRecognizer()
+def track():
+    # MediaPipe 초기화
+    mp_hands = mp.solutions.hands
+    hands = mp_hands.Hands(max_num_hands=1, min_detection_confidence=0.7)
+    mp_drawing = mp.solutions.drawing_utils
 
-finger_tip_ids = [
-    mp_hands.HandLandmark.THUMB_TIP,
-    mp_hands.HandLandmark.INDEX_FINGER_TIP,
-    mp_hands.HandLandmark.MIDDLE_FINGER_TIP,
-    mp_hands.HandLandmark.RING_FINGER_TIP,
-    mp_hands.HandLandmark.PINKY_TIP
-]
+    # 실행 시작
+    cap = cv2.VideoCapture(0)
+    cv2.namedWindow("Hand Gesture Tracking", cv2.WINDOW_NORMAL)
 
-while cap.isOpened():
-    ret, frame = cap.read()
-    if not ret:
-        break
+    trajectory = deque(maxlen=10)
+    swipe_recognizer = SwipeRecognizer()
 
-    frame = cv2.flip(frame, 1)
-    rgb = cv2.cvtColor(frame, cv2.COLOR_BGR2RGB)
-    result = hands.process(rgb)
+    finger_tip_ids = [
+        mp_hands.HandLandmark.THUMB_TIP,
+        mp_hands.HandLandmark.INDEX_FINGER_TIP,
+        mp_hands.HandLandmark.MIDDLE_FINGER_TIP,
+        mp_hands.HandLandmark.RING_FINGER_TIP,
+        mp_hands.HandLandmark.PINKY_TIP,
+    ]
 
-    gesture = None
+    while cap.isOpened():
+        ret, frame = cap.read()
+        if not ret:
+            break
 
-    if result.multi_hand_landmarks:
-        for hand_landmarks in result.multi_hand_landmarks:
-            # 중심 궤적 저장
-            h, w, _ = frame.shape
-            cx = int(np.mean([lm.x * w for lm in hand_landmarks.landmark]))
-            cy = int(np.mean([lm.y * h for lm in hand_landmarks.landmark]))
-            trajectory.append((cx, cy))
+        frame = cv2.flip(frame, 1)
+        rgb = cv2.cvtColor(frame, cv2.COLOR_BGR2RGB)
+        result = hands.process(rgb)
 
-            # 궤적 시각화
-            for i in range(1, len(trajectory)):
-                cv2.line(frame, trajectory[i - 1], trajectory[i], (255, 0, 0), 2)
+        gesture = None
 
-            # 손가락 tip 좌표 수집
-            tip_xs = [hand_landmarks.landmark[i].x for i in finger_tip_ids]
+        if result.multi_hand_landmarks:
+            for hand_landmarks in result.multi_hand_landmarks:
+                # 중심 궤적 저장
+                h, w, _ = frame.shape
+                cx = int(np.mean([lm.x * w for lm in hand_landmarks.landmark]))
+                cy = int(np.mean([lm.y * h for lm in hand_landmarks.landmark]))
+                trajectory.append((cx, cy))
 
-            # 스와이프 제스처 판단
-            swipe_gesture = swipe_recognizer.detect(tip_xs)
+                # 궤적 시각화
+                for i in range(1, len(trajectory)):
+                    cv2.line(frame, trajectory[i - 1], trajectory[i], (255, 0, 0), 2)
 
-            # 손 모양 판단
-            hand_pose = classify_hand_pose(hand_landmarks.landmark)
+                # 손가락 tip 좌표 수집
+                tip_xs = [hand_landmarks.landmark[i].x for i in finger_tip_ids]
 
-            # 제스처 결정 (손 모양이 우선)
-            gesture = hand_pose if hand_pose else swipe_gesture
+                # 스와이프 제스처 판단
+                swipe_gesture = swipe_recognizer.detect(tip_xs)
 
-            mp_drawing.draw_landmarks(frame, hand_landmarks, mp_hands.HAND_CONNECTIONS)
+                # 손 모양 판단
+                hand_pose = classify_hand_pose(hand_landmarks.landmark)
 
-    # 화면에 표시
-    if gesture:
-        cv2.putText(frame, gesture, (50, 60),
-                    cv2.FONT_HERSHEY_SIMPLEX, 1.2, (0, 0, 255), 2)
-        emoji_path = emoji_img_paths.get(gesture)
-        if emoji_path and os.path.exists(emoji_path):
-            emoji_img = cv2.imread(emoji_path, cv2.IMREAD_UNCHANGED)
-            if emoji_img is not None and emoji_img.shape[2] == 4:
-                frame = overlay_png(frame, emoji_img, 300, 150)
+                # 제스처 결정 (손 모양이 우선)
+                gesture = hand_pose if hand_pose else swipe_gesture
 
-    cv2.imshow("Hand Gesture Tracking", frame)
+                mp_drawing.draw_landmarks(
+                    frame, hand_landmarks, mp_hands.HAND_CONNECTIONS
+                )
+        else:
+            gesture = "No Hands"
 
-    if cv2.waitKey(33) & 0xFF == ord('q'):
-        break
-    if cv2.getWindowProperty("Hand Gesture Tracking", cv2.WND_PROP_VISIBLE) < 1:
-        break
+        # 화면에 표시
+        if gesture:
+            cv2.putText(
+                frame, gesture, (50, 60), cv2.FONT_HERSHEY_SIMPLEX, 1.2, (0, 0, 255), 2
+            )
+            emoji_path = emoji_img_paths.get(gesture)
+            if emoji_path and os.path.exists(emoji_path):
+                emoji_img = cv2.imread(emoji_path, cv2.IMREAD_UNCHANGED)
+                if emoji_img is not None and emoji_img.shape[2] == 4:
+                    frame = overlay_png(frame, emoji_img, 300, 150)
 
-cap.release()
-cv2.destroyAllWindows()
+            # 쿨다운 상태 표시
+            cooldown_remaining = swipe_recognizer.get_cooldown_remaining()
+            cooldown_msg = (
+                f"Cooldown: {cooldown_remaining:.1f}s"
+                if cooldown_remaining > 0
+                else "Ready for swipe"
+            )
+            cv2.putText(
+                frame,
+                cooldown_msg,
+                (50, 100),
+                cv2.FONT_HERSHEY_SIMPLEX,
+                0.9,
+                (0, 255, 255),
+                2,
+            )
+
+        cv2.imshow("Hand Gesture Tracking", frame)
+
+        # 종료 조건
+        if cv2.waitKey(1) & 0xFF == ord("q"):
+            break
+        if cv2.getWindowProperty("Hand Gesture Tracking", cv2.WND_PROP_VISIBLE) < 1:
+            break
+
+    cap.release()
+    cv2.destroyAllWindows()
+
+
+if __name__ == "__main__":
+    track()

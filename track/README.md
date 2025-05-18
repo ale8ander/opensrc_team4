@@ -13,6 +13,11 @@ pip install mediapipe opencv-python numpy
 
 ### Structure
 
+- class: SwipeRecognizer
+    - __init__
+    - detect
+    - get_cooldwon_remaining
+
 - get_hand_center: 손 중심 좌표 계산 함수
 - emojis 출력 관련 함수: classify_hand_pose, overlay_png
 - window가 꺼질 때까지 해당 함수 무한 반복
