@@ -33,6 +33,7 @@ class SwipeRecognizer:
         self.prev_avg_x = avg_x
         return gesture
 
+    # cooldwon 남은 시간 출력용
     def get_cooldown_remaining(self):
         return max(0.0, self.cooldown - (time.time() - self.last_swipe_time))
 
