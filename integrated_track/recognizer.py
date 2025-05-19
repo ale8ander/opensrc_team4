@@ -1,24 +1,23 @@
 import time
 
 class SwipeRecognizer:
-    def __init__(self, cooldown=2.0, movement_threshold=0.1, stability_threshold=0.01):
-        self.cooldown = cooldown
-        self.movement_threshold = movement_threshold
-        self.stability_threshold = stability_threshold
-        self.prev_avg_x = None
+    def __init__(self, cooldown=0.5, movement_threshold=40, stability_threshold=5):
+        self.cooldown = cooldown  # 초 단위
+        self.movement_threshold = movement_threshold  # 픽셀 단위 이동량
+        self.stability_threshold = stability_threshold  # 작은 흔들림 무시
+        self.prev_cx = None
         self.last_swipe_time = 0
 
-    def detect(self, tip_xs):
+    def detect(self, cx):
+        """
+        cx: 손 중심의 x좌표 (정수형 픽셀 좌표)
+        """
         current_time = time.time()
-        if len(tip_xs) != 5:
-            return None
-
-        avg_x = sum(tip_xs) / 5
         gesture = None
         dx = 0
 
-        if self.prev_avg_x is not None:
-            dx = avg_x - self.prev_avg_x
+        if self.prev_cx is not None:
+            dx = cx - self.prev_cx
             hand_stable = abs(dx) < self.stability_threshold
             cooldown_remaining = self.cooldown - (current_time - self.last_swipe_time)
 
@@ -30,10 +29,9 @@ class SwipeRecognizer:
                     gesture = "Swipe Right"
                     self.last_swipe_time = current_time
 
-        self.prev_avg_x = avg_x
+        self.prev_cx = cx
         return gesture
 
-    # cooldwon 남은 시간 출력용
     def get_cooldown_remaining(self):
         return max(0.0, self.cooldown - (time.time() - self.last_swipe_time))
 
@@ -62,4 +60,3 @@ def classify_hand_pose(landmarks):
         return "Victory"
     else:
         return None
-
