@@ -9,7 +9,6 @@ from collections import deque
 from recognizer import SwipeRecognizer, classify_hand_pose
 from emoji import emoji_cache, overlay_png
 
-
 def detect_scroll(trajectory, threshold=50):
     if len(trajectory) < 5:
         return None
