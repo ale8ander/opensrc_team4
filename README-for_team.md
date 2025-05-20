@@ -1,8 +1,11 @@
 # v3.2 변경사항
 1. 프로그램 흐름이 변경되었습니다.
 기존:
+
 ![Image](https://github.com/user-attachments/assets/3469198f-89d7-457e-a2d8-3f37ebb3d426)
+
 수정: (다음 실행 과정은 프로젝트 과정 중 변동이 있을 수 있으며, 현재의 테스트 코드 전제임을 밝힙니다.)
+
 ![Image](https://github.com/user-attachments/assets/ca032ffc-a011-472b-8062-7500034bd6a5)
 
 
@@ -27,6 +30,7 @@ gesture_handler.py에서 호출되어 인식된 제스처를 HTTP POST 방식으
 2-3. flask_testserver.py 파일이 추가되었습니다.
 원활한 전송 확인을 위한 로컬 테스트 서버입니다. 0.5초마다 갱신됩니다.
 출력 화면은 다음과 같습니다.
+
 ![Image](https://github.com/user-attachments/assets/ff045ad9-3c2b-4f63-927b-5b64948e280f)
 
 
