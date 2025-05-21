@@ -54,7 +54,7 @@ gesture_handler.py에서 호출되어 인식된 제스처를 HTTP POST 방식으
 - line 96~114: gesture 전송 process
 
 
-### 4. opensrc_team4 폴더에 run_all.bat 파일이 추가되었습니다.
+### 4. opensrc_team4 폴더에 run_all.bat(windows), run_all.sh(MacOS) 파일이 추가되었습니다.
  
 코드 테스트(내부 명시된 코드를 순차적으로 실행해야 함)를 위한 임시 실행 파일입니다. 추후 삭제, 수정 등등이 가능합니다. 그렇게 중요하진 않습니다.
 
