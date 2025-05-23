@@ -10,14 +10,6 @@ from collections import deque
 from recognizer import SwipeRecognizer, classify_hand_pose
 from emoji import emoji_cache, overlay_png
 
-'''
-1. OS 판단 => 제대로 동작하는지 확인 필요: completed
-2. 사용자가 필요할 때만 킬 수 있게끔 GUI를 구성
-3. main 기능 제대로 동작하도록 code 수정
-
-완료되면 README 수정
-'''
-
 # OS 확인
 def check_OS():
     os_name = platform.system()

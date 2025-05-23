@@ -3,12 +3,33 @@ import json
 import mediapipe as mp
 import numpy as np
 import time
+import platform
 import pyautogui
 import socket
 from collections import deque
 
 from recognizer import SwipeRecognizer, classify_hand_pose
 from emoji import emoji_cache, overlay_png
+
+
+'''
+1. OS 판단 => 제대로 동작하는지 확인 필요: completed
+2. 사용자가 필요할 때만 킬 수 있게끔 GUI를 구성
+3. main 기능 제대로 동작하도록 code 수정
+
+완료되면 README 수정
+'''
+
+# OS 확인
+def check_OS():
+    os_name = platform.system()
+    if os_name == "Windows":
+        return 1
+    elif os_name == "Darwin":  # MacOS
+        return 0
+    else:
+        return -1  # Linux 또는 기타
+
 
 # 제스처 전송 함수 (소켓 클라이언트)
 def send_to_handler(gesture):
@@ -80,18 +101,33 @@ def track():
             gesture = "No Hands"
 
         # 동작 실행 처리
-        if gesture == "Swipe Right":
-            pyautogui.hotkey('alt', 'tab')
-        elif gesture == "Swipe Left":
-            pyautogui.hotkey('alt', 'shift', 'tab')
-        elif gesture == "Scroll Up":
-            pyautogui.scroll(300)
-        elif gesture == "Scroll Down":
-            pyautogui.scroll(-300)
-        elif gesture == "X Sign":
-            pyautogui.hotkey('command', 'w')
-        elif gesture == "Arrow Left":
-            pyautogui.hotkey('command', '[')
+        if check_OS():  # Windows일 때
+            if gesture == "Swipe Right":
+                pyautogui.hotkey('alt', 'tab')
+            elif gesture == "Swipe Left":
+                pyautogui.hotkey('alt', 'shift', 'tab')
+            elif gesture == "Scroll Up":
+                pyautogui.scroll(300)
+            elif gesture == "Scroll Down":
+                pyautogui.scroll(-300)
+            elif gesture == "X Sign":  # 창 닫기
+                pyautogui.hotkey('alt', 'f4')
+            elif gesture == "Arrow Left":  # 브라우저 뒤로 가기
+                pyautogui.hotkey('alt', 'left')
+        else: # Mac일 때
+            if gesture == "Swipe Right":
+                pyautogui.hotkey('alt', 'tab')
+            elif gesture == "Swipe Left":
+                pyautogui.hotkey('alt', 'shift', 'tab')
+            elif gesture == "Scroll Up":
+                pyautogui.scroll(300)
+            elif gesture == "Scroll Down":
+                pyautogui.scroll(-300)
+            elif gesture == "X Sign":  # 손가락 X자 구현 필요
+                pyautogui.hotkey('command', 'w')
+            elif gesture == "Arrow Left":  # 왼쪽 화살표 손 모양 구현 필요
+                pyautogui.hotkey('command', '[')
+
 
         now = time.time()
 
