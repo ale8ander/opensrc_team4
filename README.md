@@ -21,6 +21,10 @@ An open-source project that uses Flutter and Python to recognize hand gestures a
 
 ## Contribution Guide
 
+```
+pip install -r requirements.txt
+```
+
 (To be updated)
 
 ## License
