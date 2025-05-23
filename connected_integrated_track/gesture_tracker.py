@@ -23,6 +23,7 @@ from emoji import emoji_cache, overlay_png
 # OS 확인
 def check_OS():
     os_name = platform.system()
+    print(os_name)
     if os_name == "Windows":
         return 1
     elif os_name == "Darwin":  # MacOS
@@ -51,6 +52,8 @@ def detect_scroll(trajectory, threshold=50):
 
 
 def track():
+    os_name = check_OS()
+    
     # MediaPipe 초기화
     mp_hands = mp.solutions.hands
     hands = mp_hands.Hands(max_num_hands=1, min_detection_confidence=0.7)
@@ -101,7 +104,7 @@ def track():
             gesture = "No Hands"
 
         # 동작 실행 처리
-        if check_OS():  # Windows일 때
+        if os_name:  # Windows일 때
             if gesture == "Swipe Right":
                 pyautogui.hotkey('alt', 'tab')
             elif gesture == "Swipe Left":
