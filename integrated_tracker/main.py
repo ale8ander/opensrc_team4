@@ -13,16 +13,15 @@ from emoji import emoji_cache, overlay_png
 
 
 '''
-1. OS 판단 => 제대로 동작하는지 확인 필요: completed 
-2. 사용자가 필요할 때만 킬 수 있게끔 GUI를 구성
-3. main 기능 제대로 동작하도록 code 수정
-=> 엉망인 거 수정(3초 지연 기능)
-4. 완료 후 모듈화
+- 3초 지연 기능 수정
+- 사용자가 필요할 때만 킬 수 있게끔 GUI를 구성
 
-완료되면 README 수정
+- 전체 리팩토링
+- 이후 모듈화
+- README 수정
+- OS 판단 => 제대로 동작하는지 확인 필요: completed 
++ mac일 경우 권한설정 먼저 바꿔줘야함
 '''
-
-
 
 MAX_TRAJECTORY_LENGTH = 20 
 GESTURE_HOLD_DURATION = 3
@@ -57,7 +56,7 @@ def classify_gesture(landmarks, trajectory):
     else:
         gesture = None
 
-    # ----- 이동 기반 -----
+    # 이동 기반 
     if len(trajectory) >= 5:
         dx = trajectory[-1][0] - trajectory[0][0]
         dy = trajectory[-1][1] - trajectory[0][1]
@@ -99,8 +98,7 @@ def check_OS():
 # OS예 따른 gesture 선택
 def execute_gesture_action(gesture, os_name):
     if gesture == "Swipe Right":
-        # pyautogui.hotkey('alt', 'tab') if os_name else pyautogui.hotkey('command', 'tab')
-        pyautogui.hotkey('q')
+        pyautogui.hotkey('alt', 'tab') if os_name else pyautogui.hotkey('command', 'tab')
     elif gesture == "Swipe Left":
         pyautogui.hotkey('alt', 'shift', 'tab') if os_name else pyautogui.hotkey('command', 'shift', 'tab')
     elif gesture == "Scroll Up":
@@ -129,10 +127,10 @@ def show_guidline(frame):
         text_size, _ = cv2.getTextSize(line, cv2.FONT_HERSHEY_SIMPLEX, 1.0, 2)
         text_width = text_size[0]
             
-        x = frame_width - text_width - 10  # 우측 정렬 
+        x = frame_width - text_width - 50  # 우측 정렬 
         y = 30 + i * 30 
             
-        cv2.putText(frame, line, (x, y), cv2.FONT_HERSHEY_SIMPLEX, 1.0, (0, 255, 0))
+        cv2.putText(frame, line, (x, y), cv2.FONT_HERSHEY_SIMPLEX,  1.2, (0, 0, 255), 2)
 
 # 제스처 전송 함수 (소켓 클라이언트)
 def send_to_handler(gesture):
@@ -202,7 +200,7 @@ def track():
                     last_gesture = gesture_candidate
                     gesture_timestamp = time.time()  # 시간 기록
 
-                # 현재 표시할 제스처: GESTURE_HOLD_DURATION 
+                # 현재 표시할 제스처: GESTURE_HOLD_DURATION => 이 부분 미동작
                 if time.time() - gesture_timestamp < GESTURE_HOLD_DURATION:
                     gesture = last_gesture
                 else:
