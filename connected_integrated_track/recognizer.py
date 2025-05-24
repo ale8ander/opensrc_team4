@@ -34,8 +34,12 @@ class SwipeRecognizer:
 
     def get_cooldown_remaining(self):
         return max(0.0, self.cooldown - (time.time() - self.last_swipe_time))
+    
+    
 
 
+''' 
+# emoji 기반 손모양 인식
 def classify_hand_pose(landmarks):
     finger_tips = [8, 12, 16, 20]
     finger_pips = [6, 10, 14, 18]
@@ -60,3 +64,4 @@ def classify_hand_pose(landmarks):
         return "Victory"
     else:
         return None
+'''
