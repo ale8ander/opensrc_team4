@@ -32,11 +32,33 @@ SEND_INTERVAL = 0.5
 
 # 운영체제 확인
 def check_OS():
+    """
+    Check the operating system type.
+
+    Returns:
+        int: 1 for Windows, 0 for macOS, -1 for others.
+
+    현재 운영체제(OS) 종류를 확인합니다.
+
+    반환:
+        int: Windows는 1, macOS는 0, 기타는 -1 반환
+    """
     os_name = platform.system()
     return 1 if os_name == "Windows" else 0 if os_name == "Darwin" else -1
 
 # 메인 루프
 def track():
+    """
+    Main loop to capture webcam input and recognize hand gestures.
+
+    Initializes the camera, processes hand landmarks with MediaPipe,
+    recognizes gestures, displays results, and sends socket messages.
+
+    웹캠에서 입력을 받아 손 제스처를 인식하는 메인 루프입니다.
+
+    카메라를 초기화하고, MediaPipe로 손을 인식하여,
+    제스처를 분석하고 결과를 표시하며 소켓으로 메시지를 전송합니다.
+    """
     # OS 확인
     os_name = check_OS()
     

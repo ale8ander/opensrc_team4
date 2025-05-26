@@ -12,11 +12,51 @@ instructions = {
 
 # 손가락 펼쳐졌는지 판단
 def is_extended(tip, pip, landmarks):
+    """
+    Determine whether a specific finger is extended.
+
+    Args:
+        tip (int): Index of the fingertip landmark.
+        pip (int): Index of the proximal interphalangeal joint landmark.
+        landmarks (List): List of hand landmarks from MediaPipe.
+
+    Returns:
+        bool: True if the finger is extended, False otherwise.
+
+    특정 손가락이 펴져 있는지를 판단합니다.
+
+    인자:
+        tip (int): 손끝 랜드마크 인덱스
+        pip (int): 손가락 중간 관절의 랜드마크 인덱스
+        landmarks (List): MediaPipe에서 추출한 손 랜드마크 리스트
+
+    반환:
+        bool: 손가락이 펴져 있으면 True, 아니면 False
+    """
     return landmarks[tip].y < landmarks[pip].y
 
 # 손 모양으로 제스처 분류
 # 원래 scroll, swipe 기능까지 구현했으나, mediapipe 인식 한계 상 가위, 바위, 보로 한정함
 def classify_gesture(landmarks, trajectory):
+    """
+    Classify the hand gesture based on finger landmarks and trajectory.
+
+    Args:
+        landmarks (List): List of hand landmarks.
+        trajectory (deque): Recent movement trajectory of the hand.
+
+    Returns:
+        str or None: The name of the gesture, or None if not recognized.
+
+    손가락 위치와 이동 경로를 기반으로 손 제스처를 분류합니다.
+
+    인자:
+        landmarks (List): 손 랜드마크 리스트
+        trajectory (deque): 최근 손의 이동 경로
+
+    반환:
+        str 또는 None: 인식된 제스처 이름, 또는 인식되지 않으면 None
+    """
     fingers = {
         'index': (8, 6),
         'middle': (12, 10),
@@ -50,6 +90,19 @@ def classify_gesture(landmarks, trajectory):
 
 # 제스처에 따른 키보드 동작
 def execute_gesture_action(gesture, os_name):
+    """
+    Execute a system action based on the gesture and OS.
+
+    Args:
+        gesture (str): The recognized gesture name.
+        os_name (int): Operating system code (1: Windows, 0: macOS).
+
+    제스처와 운영체제에 따라 시스템 동작을 수행합니다.
+
+    인자:
+        gesture (str): 인식된 제스처 이름
+        os_name (int): 운영체제 코드 (1: Windows, 0: macOS)
+    """
     keymap = {
         # "Swipe Right": ('alt', 'tab') if os_name else ('command', 'tab'),
         # "Swipe Left": ('alt', 'shift', 'tab') if os_name else ('command', 'shift', 'tab'),
