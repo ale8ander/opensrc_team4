@@ -43,8 +43,7 @@ git checkout -b feature/my-change
 
 ### 4. Pull Request 제출
 
-- *커밋 메시지는 아래를 최대한 준수해주세요!*
-  [Angluar JS Commit Convetion](https://gist.github.com/stephenparish/9941e89d80e2bc58a153)
+- *커밋 메시지는 예시처럼 작성해주세요.*
 - 예시
     - `feat(component): 새로운 기능 추가`
     - `fix(bug): 프레임 예외 처리`
