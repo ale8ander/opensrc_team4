@@ -81,10 +81,10 @@ def execute_gesture_action(gesture, os_name):
         "Open Hand": ('alt', 'left') if os_name else ('command', '['),
     }
 
-    if "Scroll" in gesture:
-        pyautogui.scroll(keymap[gesture])
-    elif gesture in keymap:
+    if gesture in keymap:
         pyautogui.hotkey(*keymap[gesture])
+    # elif "Scroll" in gesture: # 이거 로직 나중에 수정 필요
+    #    pyautogui.scroll(keymap[gesture])
 
 # 화면 우측 가이드 라인 제공
 def show_guidline(frame):
@@ -135,6 +135,10 @@ def track():
     last_time = 0
     last_gesture = None
     gesture_timestamp = 0
+    cooldown_remaining = 0
+    
+    gesture = "Start"
+    swipe_text = ""
 
     while cap.isOpened(): 
         ret, frame = cap.read()
@@ -144,9 +148,6 @@ def track():
         frame = cv2.flip(frame, 1)
         rgb = cv2.cvtColor(frame, cv2.COLOR_BGR2RGB)
         result = hands.process(rgb)
-
-        gesture = "No Gesture"
-        swipe_text = ""
 
         if result.multi_hand_landmarks:
             # 손이 인식된 경우
@@ -164,22 +165,14 @@ def track():
                 gesture_candidate = classify_gesture(hand_landmarks.landmark, trajectory)
 
                 # 3. 제스처가 인식된 후 3초 동안 새로운 제스처를 받지 않음
-                if time.time() - gesture_timestamp > GESTURE_HOLD_DURATION:
+                cooldown_remaining = GESTURE_HOLD_DURATION - (time.time() - gesture_timestamp)
+                if cooldown_remaining <= 0:
                     if gesture_candidate and gesture_candidate != last_gesture:
                         last_gesture = gesture_candidate
                         gesture = last_gesture
                         gesture_timestamp = time.time()
-                    else:
-                        gesture = last_gesture
-                else:
-                    gesture = "No Gesture"
-
-                cooldown_remaining = GESTURE_HOLD_DURATION - (time.time() - gesture_timestamp)
-                if cooldown_remaining > 0:
-                    cooldown_timer_text = f"Cooldown: {cooldown_remaining:.1f}s"
-                    cv2.putText(frame, cooldown_timer_text, (50, 200), cv2.FONT_HERSHEY_SIMPLEX, 1.0, (255, 255, 0), 2)
-
-                swipe_text = gesture if "Swipe" in gesture else ""
+                        
+                swipe_text = gesture if gesture and "Swipe" in gesture else ""
 
                 # 4. 제스처에 따른 키보드 동작 실행
                 mp_drawing.draw_landmarks(frame, hand_landmarks, mp_hands.HAND_CONNECTIONS)
@@ -200,12 +193,17 @@ def track():
         # 결과 화면 출력
         if gesture:
             cv2.putText(frame, gesture, (50, 60), cv2.FONT_HERSHEY_SIMPLEX, 1.2, (0, 0, 255), 2)
-            frame = overlay_png(frame, gesture, 300, 150)
-            if swipe_text:
-                cv2.putText(frame, swipe_text, (50, 110), cv2.FONT_HERSHEY_SIMPLEX, 1.0, (0, 255, 0), 2)
-            cooldown_msg = f"Cooldown: {swipe_recognizer.get_cooldown_remaining():.1f}s" \
-                if swipe_recognizer.get_cooldown_remaining() > 0 else "Ready for swipe"
-            cv2.putText(frame, cooldown_msg, (50, 150), cv2.FONT_HERSHEY_SIMPLEX, 0.9, (0, 255, 255), 2)
+
+        if cooldown_remaining > 0:
+            cooldown_timer_text = f"Cooldown: {cooldown_remaining:.1f}s"
+            cv2.putText(frame, cooldown_timer_text, (50, 200), cv2.FONT_HERSHEY_SIMPLEX, 1.0, (255, 255, 0), 2)
+
+            # frame = overlay_png(frame, gesture, 300, 150)
+            # if swipe_text:
+            #     cv2.putText(frame, swipe_text, (50, 110), cv2.FONT_HERSHEY_SIMPLEX, 1.0, (0, 255, 0), 2)
+            #cooldown_msg = f"Cooldown: {swipe_recognizer.get_cooldown_remaining():.1f}s" \
+            #     if swipe_recognizer.get_cooldown_remaining() > 0 else "Ready for swipe"
+            # cv2.putText(frame, cooldown_msg, (50, 150), cv2.FONT_HERSHEY_SIMPLEX, 0.9, (0, 255, 255), 2)
 
         # 가이드 라인 표시
         show_guidline(frame)
