@@ -16,13 +16,13 @@ GESTURE_HOLD_DURATION = 3
 SEND_INTERVAL = 0.5
 
 '''
-- 3초 지연 기능 수정
-- 사용자가 필요할 때만 킬 수 있게끔 GUI를 구성
+- 3초 지연 기능 수정 => 타이머 기능? cooldown?
 
 - 전체 리팩토링
 - 이후 모듈화
 - README 수정
 - OS 판단 => 제대로 동작하는지 확인 필요: completed 
+- 사용자가 필요할 때만 킬 수 있게끔 GUI를 구성
 + mac일 경우 권한설정 먼저 바꿔줘야함
 '''
 
@@ -145,7 +145,7 @@ def track():
         rgb = cv2.cvtColor(frame, cv2.COLOR_BGR2RGB)
         result = hands.process(rgb)
 
-        gesture = None
+        gesture = "No Gesture"
         swipe_text = ""
 
         if result.multi_hand_landmarks:
@@ -163,18 +163,21 @@ def track():
                 # 2. 제스처 판단 & 유지 조건
                 gesture_candidate = classify_gesture(hand_landmarks.landmark, trajectory)
 
-                # 3. 새 제스처가 이전과 다르고, 3초 이상 유지될 경우 갱신
+                # 3. 제스처가 인식된 후 3초 동안 새로운 제스처를 받지 않음
                 if time.time() - gesture_timestamp > GESTURE_HOLD_DURATION:
                     if gesture_candidate and gesture_candidate != last_gesture:
                         last_gesture = gesture_candidate
+                        gesture = last_gesture
                         gesture_timestamp = time.time()
-
-                gesture = last_gesture
-
-                if time.time() - gesture_timestamp < GESTURE_HOLD_DURATION:
-                    gesture = last_gesture
-                else:       
+                    else:
+                        gesture = last_gesture
+                else:
                     gesture = "No Gesture"
+
+                cooldown_remaining = GESTURE_HOLD_DURATION - (time.time() - gesture_timestamp)
+                if cooldown_remaining > 0:
+                    cooldown_timer_text = f"Cooldown: {cooldown_remaining:.1f}s"
+                    cv2.putText(frame, cooldown_timer_text, (50, 200), cv2.FONT_HERSHEY_SIMPLEX, 1.0, (255, 255, 0), 2)
 
                 swipe_text = gesture if "Swipe" in gesture else ""
 
