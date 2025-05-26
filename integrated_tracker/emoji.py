@@ -15,11 +15,12 @@ emoji_cache = {
     if os.path.exists(path)
 }
 
+# background image 위에 투명하게 합성
 def overlay_png(background, gesture, x, y):
     overlay = emoji_cache.get(gesture)
     if overlay is None or overlay.shape[2] != 4:
         return background
-
+    
     h, w = overlay.shape[:2]
     if y + h > background.shape[0] or x + w > background.shape[1]:
         return background
