@@ -1,6 +1,8 @@
 # Open Source Contribution Project - Team 4
+![logo2](https://github.com/user-attachments/assets/85c240d1-3ec5-48cf-a7b7-afbd8764b4ad)
 
 ## Primary Maintainer
+
 
 <div align="center">
 
