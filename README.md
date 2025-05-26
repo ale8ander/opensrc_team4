@@ -15,11 +15,13 @@
 ## Project Overview
 
 **Hand Gesture Remote**  
+
 An open-source project that uses Flutter and Python to recognize hand gestures and control various devices based on them.
 
 ---
 
 ## Contribution Guide
+- Also read a [CONTRIBUTING.md](CONTRIBUTING.md) file for detailed contribution guidelines.
 
 ```
 pip install -r requirements.txt
@@ -28,5 +30,4 @@ pip install -r requirements.txt
 (To be updated)
 
 ## License
-
-(To be updated)
+- This project is licensed under the [MIT License](LICENSE).
