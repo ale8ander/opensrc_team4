@@ -1,6 +1,6 @@
 # 🛠️ Related Issue / 관련 이슈
 
-fixes #your-issue-number
+closes #your-issue-number
 
 ---
 
