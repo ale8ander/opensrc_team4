@@ -25,10 +25,11 @@ SEND_INTERVAL = 0.5
 - 종료 조건
 - OS 판단 => 제대로 동작하는지 확인 필요: completed 
 - 사용자가 필요할 때만 킬 수 있게끔 GUI를 구성
-- OpenHand 인식률 떨어짐
+- OpenHand 인식률 떨어짐 => 1차 개선 completed
 
 + mac일 경우 권한설정 먼저 바꿔줘야함
 '''
+
 
 # 운영체제 확인
 def check_OS():
@@ -72,14 +73,14 @@ def track():
     cv2.namedWindow("Hand Gesture Tracking", cv2.WINDOW_NORMAL)
 
     # 제스처 인식 상태 초기화
-    trajectory = deque(maxlen=MAX_TRAJECTORY_LENGTH) # 손 이동 궤적 저장용
+    trajectory = deque(maxlen=MAX_TRAJECTORY_LENGTH)
     swipe_recognizer = SwipeRecognizer()
     last_sent = None
     last_time = 0
     last_gesture = None
     gesture_timestamp = 0
     cooldown_remaining = 0
-    
+
     gesture = "Start"
     swipe_text = ""
 
@@ -87,6 +88,7 @@ def track():
         ret, frame = cap.read()
         if not ret: # 프레임 읽기 실패 시 종료
             break
+
         # 영상 처리 및 손 인식
         frame = cv2.flip(frame, 1)
         rgb = cv2.cvtColor(frame, cv2.COLOR_BGR2RGB)
@@ -106,21 +108,23 @@ def track():
 
                 # 2. 제스처 판단 & 유지 조건
                 gesture_candidate = classify_gesture(hand_landmarks.landmark, trajectory)
-
+                
                 # 3. 제스처가 인식된 후 3초 동안 새로운 제스처를 받지 않음
                 cooldown_remaining = GESTURE_HOLD_DURATION - (time.time() - gesture_timestamp)
-                if cooldown_remaining <= 0:
+                
+                #3. 제스처가 인식된 후 3초 동안 새로운 제스처를 받지 않음, Swipe Ready일 때는 쿨다운 무시
+                if gesture_candidate == "Swipe Ready" or cooldown_remaining <= 0:
                     if gesture_candidate:
                         last_gesture = gesture_candidate
                         gesture = last_gesture
-                        gesture_timestamp = time.time()
+                        # Swipe Ready는 타이머 갱신 안 함
+                        if gesture != "Swipe Ready":
+                            gesture_timestamp = time.time()
+
                         # 4. 제스처에 따른 키보드 동작 실행
                         execute_gesture_action(gesture, os_name)
-                        
-                # swipe_text = gesture if gesture and "Swipe" in gesture else ""
 
                 mp_drawing.draw_landmarks(frame, hand_landmarks, mp_hands.HAND_CONNECTIONS)
-                
 
         # 소켓 전송
         now = time.time()
@@ -133,28 +137,24 @@ def track():
             swipe_payload = {"gesture": swipe_text, "is_swipe": True}
             send_to_handler(json.dumps(swipe_payload))
             last_sent = swipe_text
-        
+
         # 결과 화면 출력
         if gesture:
             frame = overlay_png(frame, gesture, 300, 150)
-            cv2.putText(frame, gesture, (50, 60), cv2.FONT_HERSHEY_SIMPLEX, 1.2, (0, 0, 255), 2)
+            cv2.putText(frame, gesture, (50, 50), cv2.FONT_HERSHEY_SIMPLEX, 1.2, (0, 0, 255), 2)
             description = instructions.get(gesture, "")
-            cv2.putText(frame, description, (50, 110), cv2.FONT_HERSHEY_SIMPLEX, 1.2, (0, 255, 0), 2)
-        
-        if cooldown_remaining > 0:
+            cv2.putText(frame, description, (50, 90), cv2.FONT_HERSHEY_SIMPLEX, 1.2, (0, 255, 0), 2)
+
+        if cooldown_remaining > 0 and gesture != "Swipe Ready":
             cooldown_timer_text = f"Cooldown: {cooldown_remaining:.1f}s"
             cv2.putText(frame, cooldown_timer_text, (50, 200), cv2.FONT_HERSHEY_SIMPLEX, 1.0, (255, 255, 0), 2)
-            
-            # if swipe_text:
-            #     cv2.putText(frame, swipe_text, (50, 110), cv2.FONT_HERSHEY_SIMPLEX, 1.0, (0, 255, 0), 2)
-            #cooldown_msg = f"Cooldown: {swipe_recognizer.get_cooldown_remaining():.1f}s" \
-            #     if swipe_recognizer.get_cooldown_remaining() > 0 else "Ready for swipe"
-            # cv2.putText(frame, cooldown_msg, (50, 150), cv2.FONT_HERSHEY_SIMPLEX, 0.9, (0, 255, 255), 2)
 
         # 가이드 라인 표시
-        show_guidline(frame)
+        guideline_frame = np.zeros_like(frame)  # 검정 배경의 빈 이미지 생성
+        show_guidline(guideline_frame)
+        cv2.imshow("Guideline", guideline_frame)  # 가이드라인을 별도 창에 출력하였습니다.
         cv2.imshow("Hand Gesture Tracking", frame)
-        
+
         # 종료 처리
         if cv2.waitKey(1) & 0xFF == ord("q"):
             break
