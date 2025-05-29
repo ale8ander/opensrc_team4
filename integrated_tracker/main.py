@@ -46,6 +46,125 @@ def check_OS():
     os_name = platform.system()
     return 1 if os_name == "Windows" else 0 if os_name == "Darwin" else -1
 
+def update_trajectory(trajectory, hand_landmarks, frame_shape):
+    """
+    Calculate the center of the hand based on landmarks and append it to the trajectory.
+
+    Args:
+        trajectory (deque): A deque storing recent hand center positions.
+        hand_landmarks (List[Landmark]): List of 21 hand landmark points.
+        frame_shape (tuple): Shape of the frame (height, width, channels).
+
+    Returns:
+        tuple: The calculated center (cx, cy) of the hand.
+
+    손 랜드마크를 기반으로 손 중심 좌표를 계산하여 trajectory에 저장합니다.
+
+    반환:
+        tuple: 손 중심 좌표 (cx, cy)
+    """
+    h, w, _ = frame_shape
+    cx = int(np.mean([lm.x * w for lm in hand_landmarks]))
+    cy = int(np.mean([lm.y * h for lm in hand_landmarks]))
+    trajectory.append((cx, cy))
+    return cx, cy
+
+
+def draw_trajectory_on_frame(frame, trajectory):
+    """
+    Draw the trajectory of hand movement on the frame.
+
+    Args:
+        frame (np.ndarray): The current video frame.
+        trajectory (deque): A deque containing past hand positions.
+
+    손 이동 궤적을 프레임 위에 선으로 시각화합니다.
+    """
+    for i in range(1, len(trajectory)):
+        cv2.line(frame, trajectory[i - 1], trajectory[i], (255, 0, 0), 2)
+
+
+def should_update_gesture(gesture_timestamp, hold_duration):
+    """
+    Check if the cooldown period for gesture recognition has passed.
+
+    Args:
+        gesture_timestamp (float): Timestamp of the last recognized gesture.
+        hold_duration (float): Cooldown duration in seconds.
+
+    Returns:
+        bool: True if gesture can be updated, False otherwise.
+
+    이전 제스처 인식 이후 쿨다운 시간이 지났는지를 확인합니다.
+
+    반환:
+        bool: 제스처 갱신 가능 여부
+    """
+    cooldown_remaining = hold_duration - (time.time() - gesture_timestamp)
+    return cooldown_remaining <= 0
+
+
+def process_hand_gesture(hand_landmarks, trajectory, gesture_timestamp, hold_duration, os_name):
+    """
+    Determine the gesture from current hand data and handle cooldown logic.
+
+    Args:
+        hand_landmarks (List[Landmark]): List of current hand landmarks.
+        trajectory (deque): Stored hand movement trajectory.
+        gesture_timestamp (float): Timestamp of last gesture recognition.
+        hold_duration (float): Cooldown duration in seconds.
+        os_name (int): OS identifier (1: Windows, 0: macOS, -1: others)
+
+    Returns:
+        tuple: (recognized gesture or None, updated gesture_timestamp)
+
+    현재 손 상태로부터 제스처를 판단하고, 쿨다운 조건을 충족하면 제스처를 실행합니다.
+
+    반환:
+        tuple: (인식된 제스처 or None, 갱신된 gesture_timestamp)
+    """
+    gesture_candidate = classify_gesture(hand_landmarks, trajectory)
+
+    if should_update_gesture(gesture_timestamp, hold_duration):
+        if gesture_candidate:
+            gesture_timestamp = time.time()
+            execute_gesture_action(gesture_candidate, os_name)
+            return gesture_candidate, gesture_timestamp
+
+    return None, gesture_timestamp
+
+
+def send_gesture_via_socket(gesture, is_swipe, last_sent, last_time):
+    """
+    Send the gesture result via socket if conditions are met.
+
+    Args:
+        gesture (str): The name of the gesture to send.
+        is_swipe (bool): Whether the gesture is a swipe gesture.
+        last_sent (str): The last gesture that was sent.
+        last_time (float): Timestamp of the last socket transmission.
+
+    Returns:
+        tuple: (updated last_sent, updated last_time)
+
+    제스처가 전송 조건을 만족하면 소켓으로 전송하고, 전송 이력을 업데이트합니다.
+
+    반환:
+        tuple: (전송한 제스처, 전송 시각)
+    """
+    now = time.time()
+    if gesture and gesture != "No Hands" and (now - last_time) > SEND_INTERVAL:
+        payload = {
+            "gesture": gesture,
+            "is_swipe": is_swipe
+        }
+        send_to_handler(json.dumps(payload))
+        return gesture, now
+    return last_sent, last_time
+
+
+
+
 # 메인 루프
 def track():
     """
@@ -85,81 +204,59 @@ def track():
 
     while cap.isOpened(): 
         ret, frame = cap.read()
-        if not ret: # 프레임 읽기 실패 시 종료
+        if not ret:
             break
-        # 영상 처리 및 손 인식
+
         frame = cv2.flip(frame, 1)
         rgb = cv2.cvtColor(frame, cv2.COLOR_BGR2RGB)
         result = hands.process(rgb)
 
         if result.multi_hand_landmarks:
-            # 손이 인식된 경우
             for hand_landmarks in result.multi_hand_landmarks:
-                # 1. 손 중심좌표 계산해서 trajectory에 저장
-                h, w, _ = frame.shape
-                cx = int(np.mean([lm.x * w for lm in hand_landmarks.landmark]))
-                cy = int(np.mean([lm.y * h for lm in hand_landmarks.landmark]))
-                trajectory.append((cx, cy))
-                # 이동 경로 시각화
-                for i in range(1, len(trajectory)):
-                    cv2.line(frame, trajectory[i - 1], trajectory[i], (255, 0, 0), 2)
+                update_trajectory(trajectory, hand_landmarks.landmark, frame.shape)
+                draw_trajectory_on_frame(frame, trajectory)
 
-                # 2. 제스처 판단 & 유지 조건
-                gesture_candidate = classify_gesture(hand_landmarks.landmark, trajectory)
+                gesture, gesture_timestamp = process_hand_gesture(
+                    hand_landmarks.landmark,
+                    trajectory,
+                    gesture_timestamp,
+                    GESTURE_HOLD_DURATION,
+                    os_name
+                )
 
-                # 3. 제스처가 인식된 후 3초 동안 새로운 제스처를 받지 않음
-                cooldown_remaining = GESTURE_HOLD_DURATION - (time.time() - gesture_timestamp)
-                if cooldown_remaining <= 0:
-                    if gesture_candidate:
-                        last_gesture = gesture_candidate
-                        gesture = last_gesture
-                        gesture_timestamp = time.time()
-                        # 4. 제스처에 따른 키보드 동작 실행
-                        execute_gesture_action(gesture, os_name)
-                        
-                # swipe_text = gesture if gesture and "Swipe" in gesture else ""
+                if gesture:
+                    last_gesture = gesture
 
                 mp_drawing.draw_landmarks(frame, hand_landmarks, mp_hands.HAND_CONNECTIONS)
-                
 
-        # 소켓 전송
-        now = time.time()
-        if gesture and gesture != "No Hands" and (now - last_time) > SEND_INTERVAL:
-            payload = {"gesture": gesture, "is_swipe": False}
-            send_to_handler(json.dumps(payload))
-            last_time = now
+        # 소켓 전송 (일반 제스처)
+        last_sent, last_time = send_gesture_via_socket(gesture, False, last_sent, last_time)
 
-        if swipe_text and (swipe_text != last_sent or (now - last_time) > SEND_INTERVAL):
-            swipe_payload = {"gesture": swipe_text, "is_swipe": True}
-            send_to_handler(json.dumps(swipe_payload))
-            last_sent = swipe_text
-        
+        # 소켓 전송 (스와이프 제스처)
+        if swipe_text:
+            last_sent, last_time = send_gesture_via_socket(swipe_text, True, last_sent, last_time)
+
+    
         # 결과 화면 출력
         if gesture:
             frame = overlay_png(frame, gesture, 300, 150)
             cv2.putText(frame, gesture, (50, 60), cv2.FONT_HERSHEY_SIMPLEX, 1.2, (0, 0, 255), 2)
             description = instructions.get(gesture, "")
             cv2.putText(frame, description, (50, 110), cv2.FONT_HERSHEY_SIMPLEX, 1.2, (0, 255, 0), 2)
-        
+    
+        cooldown_remaining = GESTURE_HOLD_DURATION - (time.time() - gesture_timestamp)
         if cooldown_remaining > 0:
             cooldown_timer_text = f"Cooldown: {cooldown_remaining:.1f}s"
             cv2.putText(frame, cooldown_timer_text, (50, 200), cv2.FONT_HERSHEY_SIMPLEX, 1.0, (255, 255, 0), 2)
-            
-            # if swipe_text:
-            #     cv2.putText(frame, swipe_text, (50, 110), cv2.FONT_HERSHEY_SIMPLEX, 1.0, (0, 255, 0), 2)
-            #cooldown_msg = f"Cooldown: {swipe_recognizer.get_cooldown_remaining():.1f}s" \
-            #     if swipe_recognizer.get_cooldown_remaining() > 0 else "Ready for swipe"
-            # cv2.putText(frame, cooldown_msg, (50, 150), cv2.FONT_HERSHEY_SIMPLEX, 0.9, (0, 255, 255), 2)
 
-        # 가이드 라인 표시
         show_guidline(frame)
         cv2.imshow("Hand Gesture Tracking", frame)
-        
-        # 종료 처리
+
         if cv2.waitKey(1) & 0xFF == ord("q"):
             break
         if cv2.getWindowProperty("Hand Gesture Tracking", cv2.WND_PROP_VISIBLE) < 1:
             break
+
 
     cap.release()
     cv2.destroyAllWindows()
