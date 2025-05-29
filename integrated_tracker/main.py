@@ -204,18 +204,22 @@ def track():
 
     while cap.isOpened(): 
         ret, frame = cap.read()
-        if not ret:
+        if not ret: #프레임 읽기 실패 시 종료
             break
-
+	
+	# 영상 좌우 반전 및 RGB로 색상 변환 (MediaPipe 처리를 위해)
         frame = cv2.flip(frame, 1)
         rgb = cv2.cvtColor(frame, cv2.COLOR_BGR2RGB)
         result = hands.process(rgb)
 
         if result.multi_hand_landmarks:
             for hand_landmarks in result.multi_hand_landmarks:
+            	# 손의 중심 좌표 계산 및 궤적 리스트에 추가
                 update_trajectory(trajectory, hand_landmarks.landmark, frame.shape)
+                 # 이동 경로 시각화
                 draw_trajectory_on_frame(frame, trajectory)
-
+		
+		# 현재 손 제스처 분석 및 실행
                 gesture, gesture_timestamp = process_hand_gesture(
                     hand_landmarks.landmark,
                     trajectory,
@@ -223,18 +227,20 @@ def track():
                     GESTURE_HOLD_DURATION,
                     os_name
                 )
-
+		
+		# 인식된 제스처 기록 (마지막 제스처 업데이트)
                 if gesture:
                     last_gesture = gesture
-
+                    
+		# 손 랜드마크 연결선 시각화
                 mp_drawing.draw_landmarks(frame, hand_landmarks, mp_hands.HAND_CONNECTIONS)
 
         # 소켓 전송 (일반 제스처)
         last_sent, last_time = send_gesture_via_socket(gesture, False, last_sent, last_time)
 
         # 소켓 전송 (스와이프 제스처)
-        if swipe_text:
-            last_sent, last_time = send_gesture_via_socket(swipe_text, True, last_sent, last_time)
+        #if swipe_text:
+        #    last_sent, last_time = send_gesture_via_socket(swipe_text, True, last_sent, last_time)
 
     
         # 결과 화면 출력
