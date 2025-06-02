@@ -22,11 +22,46 @@ An open-source project that uses Flutter and Python to recognize hand gestures a
 
 ---
 
+## 다음은 GitHub 프로젝트 opensrc_team4에 사용할 수 있는 Installation Guide (설치 가이드) 예시입니다. README.md에 붙여 넣으면 좋습니다.
+
+⸻
+
+## 🛠️ Installation Guide
+
+🧪 Development Mode
+
+```
+git clone https://github.com/ale8ander/opensrc_team4.git
+cd opensrc_team4
+python main.py
+```
+
+Install dependencies:
+
+```pip install -r requirements.txt```
+
+⚠️ macOS 사용자:
+	•	시스템 환경설정 → 보안 및 개인정보 보호 → 카메라 → “Terminal” 또는 “Python”에 접근 권한 허용 필요
+	•	권한이 없으면 웹캠이 작동하지 않습니다.
+
+⸻
+
+🚀 Run the App
+
+python main.py
+
+윈도우에서는 cmd, 맥에서는 Terminal을 통해 실행하세요.
+
+---
+
 ## Contribution Guide
 - Also read a [CONTRIBUTING.md](CONTRIBUTING.md) file for detailed contribution guidelines.
 
+
+새로운 기능을 개발하려면 브랜치를 따로 파서 작업하세요
+
 ```
-pip install -r requirements.txt
+git checkout -b feature/your-feature-name
 ```
 
 (To be updated)
