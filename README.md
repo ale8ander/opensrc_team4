@@ -54,7 +54,7 @@ python integrated_tracker/main.py
 - Also read a [CONTRIBUTING.md](CONTRIBUTING.md) file for detailed contribution guidelines.
 
 ### How to Contribute
-1.	저장소 Fork
+1.	저장소 Fork<br>
 오른쪽 상단의 “Fork” 버튼을 눌러 본인의 GitHub 계정으로 저장소를 복사합니다.
 	
  2.	Fork한 저장소 클론
@@ -63,35 +63,35 @@ git clone https://github.com/본인아이디/opensrc_team4.git
 cd opensrc_team4
 ```
 
-3.	새 브랜치 생성
+3.	새 브랜치 생성<br>
 ```git checkout -b feature/기능이름```
 
-4.	의존성 설치
+4.	의존성 설치<br>
 ```pip install -r requirements.txt```
 
 
-5.	코드 수정 및 커밋
+5.	코드 수정 및 커밋<br>
 ```
 git add .
 git commit -m "기능 설명을 여기에 작성"
 ```
 
 
-6.	원격 저장소에 푸시
+6.	원격 저장소에 푸시<br>
 ```
 git push origin feature/기능이름
 ```
 
-7.	Pull Request 생성
+7.	Pull Request 생성<br>
 GitHub 웹사이트에서 “Compare & pull request” 버튼을 눌러 PR을 생성하고, 변경 사항을 명확히 설명해주세요.
 
 ⸻
 
-💡 기여 팁
-	•	코드가 에러 없이 정상 실행되는지 확인해주세요.
-	•	Python PEP8 스타일 가이드를 지켜주세요.
-	•	가능한 경우 docstring 주석을 추가해주세요.
-	•	버그 수정이라면 원인과 해결 방법을 설명해주세요.
+💡 기여 팁<br>
+	•	코드가 에러 없이 정상 실행되는지 확인해주세요.<br>
+	•	Python PEP8 스타일 가이드를 지켜주세요.(https://peps.python.org/pep-0008/)<br>
+	•	가능한 경우 docstring 주석을 추가해주세요.<br>
+	•	버그 수정이라면 원인과 해결 방법을 설명해주세요.<br>
 
 (To be updated)
 
