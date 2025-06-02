@@ -16,9 +16,19 @@
 
 ## Project Overview
 
-**Hand Gesture Remote**  
+**Hand Gesture Controller**  
 
 An open-source project that uses Flutter and Python to recognize hand gestures and control various devices based on them.
+
+### Main Feature
+
+사용자가 특정 동작을 취하면 해당 동작에 해당하는 명령키가 동작합니다.<br>
+현재는 mediapipe의 인식률 저하 문제로 총 3가지 정적 동작만 인식 중입니다.<br>
+
+✌️ Victory: Close Tab ❎<br>
+✊ Fist: Refresh 🔄<br>
+✋ Open Hand: Go Back ⏪️<br>
+
 
 ---
 
@@ -44,7 +54,7 @@ Install dependencies:
 
 🚀 Run the App
 
-python integrated_tracker/main.py
+```python integrated_tracker/main.py```
 
 윈도우에서는 cmd, 맥에서는 Terminal을 통해 실행하세요.
 
