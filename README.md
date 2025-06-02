@@ -22,10 +22,6 @@ An open-source project that uses Flutter and Python to recognize hand gestures a
 
 ---
 
-## 다음은 GitHub 프로젝트 opensrc_team4에 사용할 수 있는 Installation Guide (설치 가이드) 예시입니다. README.md에 붙여 넣으면 좋습니다.
-
-⸻
-
 ## 🛠️ Installation Guide
 
 🧪 Development Mode
