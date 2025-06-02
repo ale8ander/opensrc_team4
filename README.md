@@ -29,7 +29,7 @@ An open-source project that uses Flutter and Python to recognize hand gestures a
 ```
 git clone https://github.com/ale8ander/opensrc_team4.git
 cd opensrc_team4
-python main.py
+python integrated_tracker/main.py
 ```
 
 Install dependencies:
@@ -44,7 +44,7 @@ Install dependencies:
 
 🚀 Run the App
 
-python main.py
+python integrated_tracker/main.py
 
 윈도우에서는 cmd, 맥에서는 Terminal을 통해 실행하세요.
 
@@ -53,12 +53,45 @@ python main.py
 ## Contribution Guide
 - Also read a [CONTRIBUTING.md](CONTRIBUTING.md) file for detailed contribution guidelines.
 
-
-새로운 기능을 개발하려면 브랜치를 따로 파서 작업하세요
-
+### How to Contribute
+1.	저장소 Fork
+오른쪽 상단의 “Fork” 버튼을 눌러 본인의 GitHub 계정으로 저장소를 복사합니다.
+	
+ 2.	Fork한 저장소 클론
 ```
-git checkout -b feature/your-feature-name
+git clone https://github.com/본인아이디/opensrc_team4.git
+cd opensrc_team4
 ```
+
+3.	새 브랜치 생성
+```git checkout -b feature/기능이름```
+
+4.	의존성 설치
+```pip install -r requirements.txt```
+
+
+5.	코드 수정 및 커밋
+```
+git add .
+git commit -m "기능 설명을 여기에 작성"
+```
+
+
+6.	원격 저장소에 푸시
+```
+git push origin feature/기능이름
+```
+
+7.	Pull Request 생성
+GitHub 웹사이트에서 “Compare & pull request” 버튼을 눌러 PR을 생성하고, 변경 사항을 명확히 설명해주세요.
+
+⸻
+
+💡 기여 팁
+	•	코드가 에러 없이 정상 실행되는지 확인해주세요.
+	•	Python PEP8 스타일 가이드를 지켜주세요.
+	•	가능한 경우 docstring 주석을 추가해주세요.
+	•	버그 수정이라면 원인과 해결 방법을 설명해주세요.
 
 (To be updated)
 
