@@ -24,12 +24,10 @@
 ---
 
 ### 2. 포크 및 브랜치 생성
-
-*브랜치는 아래 페이지를 참고해서 분류에 맞춰 생성해주세요.*
-[Angluar JS Commit Convetion](https://gist.github.com/stephenparish/9941e89d80e2bc58a153)
-
+- 프로젝트를 포크해주세요.
+- 로컬 저장소에 클론한 후, 새로운 브랜치를 생성해주세요.
 ```bash
-git checkout -b feature/my-change
+git checkout -b feature/issue# - 번호
 ```
 
 ---
@@ -45,8 +43,8 @@ git checkout -b feature/my-change
 
 - *커밋 메시지는 예시처럼 작성해주세요.*
 - 예시
-    - `feat(component): 새로운 기능 추가`
-    - `fix(bug): 프레임 예외 처리`
+    - `feat(issue#N): 새로운 기능 추가`
+    - `fix(issue#N): 프레임 예외 처리`
 - PR 본문에 다음 내용을 포함해주세요:
     - 관련 이슈 (예: `Closes #12`)
     - 필요 시 스크린샷이나 로그 첨부
@@ -67,9 +65,9 @@ git checkout -b feature/my-change
 **커밋 메시지 예시**
 
 ```
-fix(opencv): 프레임 초기화 예외 처리
-feat(ui): 프레임 속도 설정 버튼 추가
-docs: 오탈자 수정 및 문서 개선
+fix(issue# - 관련 이슈 번호): 프레임 초기화 예외 처리
+feat(issue# - 관련 이슈 번호): 프레임 속도 설정 버튼 추가
+docs(issue# - 관련 이슈 번호): 오탈자 수정 및 문서 개선
 
 ```
 
