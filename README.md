@@ -52,6 +52,17 @@ Install dependencies:
 
 ⸻
 
+⚠️ Python 버전 주의:
+
+mediapipe는 Python ~ 3.12 버전에서만 설치 및 사용이 가능합니다.  
+Python 3.13 이상 환경에서는 pip install mediapipe가 실패하므로,  
+필수적으로 Python 3.12 이하의 버전에서 실행환경을 구성해 주세요.
+
+Python 3.13 이상 버전을 사용중이신 분들께서는 아래의 링크를 통해 mediapipe 사용 가능한 버전을 다운받아주시면 됩니다. 
+https://www.python.org/downloads/release/python-3100/ 
+
+⸻
+
 🚀 Run the App
 
 ```python integrated_tracker/main.py```
