@@ -14,7 +14,7 @@ from gesture_core import (
 from my_gui import show_guidline
 from recognizer import SwipeRecognizer
 from emoji import overlay_png
-from my_socket import send_to_handler
+#from my_socket import send_to_handler
 
 MAX_TRAJECTORY_LENGTH = 20
 GESTURE_HOLD_DURATION = 3
@@ -47,7 +47,7 @@ def check_OS():
     return 1 if os_name == "Windows" else 0 if os_name == "Darwin" else -1
 
 
-def send_gesture_via_socket(gesture, is_swipe, last_sent, last_time):
+#def send_gesture_via_socket(gesture, is_swipe, last_sent, last_time):
     """
     Send the gesture result via socket if conditions are met.
 
@@ -65,15 +65,15 @@ def send_gesture_via_socket(gesture, is_swipe, last_sent, last_time):
     반환:
         tuple: (전송한 제스처, 전송 시각)
     """
-    now = time.time()
-    if gesture and gesture != "No Hands" and (now - last_time) > SEND_INTERVAL:
-        payload = {
-            "gesture": gesture,
-            "is_swipe": is_swipe
-        }
-        send_to_handler(json.dumps(payload))
-        return gesture, now
-    return last_sent, last_time
+#    now = time.time()
+#    if gesture and gesture != "No Hands" and (now - last_time) > SEND_INTERVAL:
+#        payload = {
+#            "gesture": gesture,
+#            "is_swipe": is_swipe
+#        }
+#        send_to_handler(json.dumps(payload))
+#        return gesture, now
+#    return last_sent, last_time
 
 
 
@@ -149,7 +149,7 @@ def track():
                 mp_drawing.draw_landmarks(frame, hand_landmarks, mp_hands.HAND_CONNECTIONS)
 
         # 소켓 전송 (일반 제스처)
-        last_sent, last_time = send_gesture_via_socket(gesture, False, last_sent, last_time)
+        #last_sent, last_time = send_gesture_via_socket(gesture, False, last_sent, last_time)
 
         # 소켓 전송 (스와이프 제스처)
         #if swipe_text:
