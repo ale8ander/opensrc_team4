@@ -1,8 +1,16 @@
 # Open Source Contribution Project - Team 4
-![logo2](https://github.com/user-attachments/assets/85c240d1-3ec5-48cf-a7b7-afbd8764b4ad)
 
-## Primary Maintainer
+### Hand Gesture Controller
 
+**This repository provides an OpenCV-based multi-remote control using hand gesture recognition.**
+*For planned features and progress, please refer to [ROADMAP.md](./docs/ROADMAP.md).*
+<div align="center">
+
+![project Team Logo](https://github.com/user-attachments/assets/85c240d1-3ec5-48cf-a7b7-afbd8764b4ad){: width="30%" height="30%"}
+
+</div>
+
+### Primary Maintainer
 
 <div align="center">
 
@@ -14,107 +22,52 @@
 
 ---
 
-## Project Overview
+## Overview
 
-**Hand Gesture Controller**  
+### Installation Guide
 
-An open-source project that uses Flutter and Python to recognize hand gestures and control various devices based on them.
+##### Step 1. Download `Python3`
 
-### Main Feature
+[Install Python 3.10 version](https://www.python.org/downloads/release/python-3100/)
 
-사용자가 특정 동작을 취하면 해당 동작에 해당하는 명령키가 동작합니다.<br>
-현재는 mediapipe의 인식률 저하 문제로 총 3가지 정적 동작만 인식 중입니다.<br>
+> You should click the 'Add to PATH' button when installing Python.
 
-✌️ Victory: Close Tab ❎<br>
-✊ Fist: Refresh 🔄<br>
-✋ Open Hand: Go Back ⏪️<br>
+##### Step 2. Download this project
+>
+> We recommend using the following command-line tools:
+• On Windows: cmd
+• On macOS: Terminal
 
+###### If you have `Git`
 
----
-
-## 🛠️ Installation Guide
-
-🧪 Development Mode
-
-```
+```bash
 git clone https://github.com/ale8ander/opensrc_team4.git
 cd opensrc_team4
+pip install -r requirements.txt
 python integrated_tracker/main.py
 ```
 
-Install dependencies:
+###### If you don't have git
 
-```pip install -r requirements.txt```
+- Click the Code button at the top of this page and select Download ZIP.
 
-⚠️ macOS 사용자:
-	•	시스템 환경설정 → 보안 및 개인정보 보호 → 카메라 → “Terminal” 또는 “Python”에 접근 권한 허용 필요
-	•	권한이 없으면 웹캠이 작동하지 않습니다.
+- Unzip the downloaded file.
 
-⸻
+- Open your command line tool.
 
-⚠️ Python 버전 주의:
-
-mediapipe는 Python ~ 3.12 버전에서만 설치 및 사용이 가능합니다.  
-Python 3.13 이상 환경에서는 pip install mediapipe가 실패하므로,  
-필수적으로 Python 3.12 이하의 버전에서 실행환경을 구성해 주세요.
-
-Python 3.13 이상 버전을 사용중이신 분들께서는 아래의 링크를 통해 mediapipe 사용 가능한 버전을 다운받아주시면 됩니다. 
-https://www.python.org/downloads/release/python-3100/ 
-
-⸻
-
-🚀 Run the App
-
-```python integrated_tracker/main.py```
-
-윈도우에서는 cmd, 맥에서는 Terminal을 통해 실행하세요.
-
----
-
-## Contribution Guide
-- Also read a [CONTRIBUTING.md](CONTRIBUTING.md) file for detailed contribution guidelines.
-
-### How to Contribute
-1.	저장소 Fork<br>
-오른쪽 상단의 “Fork” 버튼을 눌러 본인의 GitHub 계정으로 저장소를 복사합니다.
-	
- 2.	Fork한 저장소 클론
-```
-git clone https://github.com/본인아이디/opensrc_team4.git
-cd opensrc_team4
+```bash
+pip install -r requirements.txt
+python integrated_tracker/main.py
 ```
 
-3.	새 브랜치 생성<br>
-```git checkout -b feature/기능이름```
+⚠️ macOS Users:
+• Navigate to System Preferences → Security & Privacy → Camera, and grant access to "Terminal" or "Python".
+• If permission is not granted, the webcam will not function.
 
-4.	의존성 설치<br>
-```pip install -r requirements.txt```
+⚠️ Installation
 
+- If you are having trouble with installation, please refer to [INSTALL.md](./docs/INSTALL.md).
 
-5.	코드 수정 및 커밋<br>
-```
-git add .
-git commit -m "기능 설명을 여기에 작성"
-```
+## Want to contribute to this project?
 
-
-6.	원격 저장소에 푸시<br>
-```
-git push origin feature/기능이름
-```
-
-7.	Pull Request 생성<br>
-GitHub 웹사이트에서 “Compare & pull request” 버튼을 눌러 PR을 생성하고, 변경 사항을 명확히 설명해주세요.
-
-⸻
-
-💡 기여 팁<br>
-	•	코드가 에러 없이 정상 실행되는지 확인해주세요.<br>
-	•	Python PEP8 스타일 가이드를 지켜주세요.(https://peps.python.org/pep-0008/)<br>
-	•	가능한 경우 docstring 주석을 추가해주세요.<br>
-	•	버그 수정이라면 원인과 해결 방법을 설명해주세요.<br>
-
-(To be updated)
-
-## License
-- This project is licensed under the [MIT License](LICENSE).
+- Please read the following guide: [CONTRIBUTING.md](./docs/CONTRIBUTING.md)
