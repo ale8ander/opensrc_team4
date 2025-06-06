@@ -1,8 +1,16 @@
 # Open Source Contribution Project - Team 4
-![logo2](https://github.com/user-attachments/assets/85c240d1-3ec5-48cf-a7b7-afbd8764b4ad)
 
-## Primary Maintainer
+### Hand Gesture Controller
 
+**This repository provides an OpenCV-based multi-remote control using hand gesture recognition.**
+*For planned features and progress, please refer to [ROADMAP.md](./docs/ROADMAP.md).*
+<div align="center">
+
+![project Team Logo](https://github.com/user-attachments/assets/85c240d1-3ec5-48cf-a7b7-afbd8764b4ad){: width="30%" height="30%"}
+
+</div>
+
+### Primary Maintainer
 
 <div align="center">
 
@@ -14,22 +22,52 @@
 
 ---
 
-## Project Overview
+## Overview
 
-**Hand Gesture Remote**  
+### Installation Guide
 
-An open-source project that uses Flutter and Python to recognize hand gestures and control various devices based on them.
+##### Step 1. Download `Python3`
 
----
+[Install Python 3.10 version](https://www.python.org/downloads/release/python-3100/)
 
-## Contribution Guide
-- Also read a [CONTRIBUTING.md](CONTRIBUTING.md) file for detailed contribution guidelines.
+> You should click the 'Add to PATH' button when installing Python.
 
-```
+##### Step 2. Download this project
+>
+> We recommend using the following command-line tools:
+• On Windows: cmd
+• On macOS: Terminal
+
+###### If you have `Git`
+
+```bash
+git clone https://github.com/ale8ander/opensrc_team4.git
+cd opensrc_team4
 pip install -r requirements.txt
+python integrated_tracker/main.py
 ```
 
-(To be updated)
+###### If you don't have git
 
-## License
-- This project is licensed under the [MIT License](LICENSE).
+- Click the Code button at the top of this page and select Download ZIP.
+
+- Unzip the downloaded file.
+
+- Open your command line tool.
+
+```bash
+pip install -r requirements.txt
+python integrated_tracker/main.py
+```
+
+⚠️ macOS Users:
+• Navigate to System Preferences → Security & Privacy → Camera, and grant access to "Terminal" or "Python".
+• If permission is not granted, the webcam will not function.
+
+⚠️ Installation
+
+- If you are having trouble with installation, please refer to [INSTALL.md](./docs/INSTALL.md).
+
+## Want to contribute to this project?
+
+- Please read the following guide: [CONTRIBUTING.md](./docs/CONTRIBUTING.md)
