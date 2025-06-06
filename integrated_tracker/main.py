@@ -76,8 +76,6 @@ def check_OS():
 #    return last_sent, last_time
 
 
-
-
 # 메인 루프
 def track():
     """
@@ -93,92 +91,103 @@ def track():
     """
     # OS 확인
     os_name = check_OS()
-    
+
     # MediaPipe 및 카메라 초기화
     mp_hands = mp.solutions.hands
-    hands = mp_hands.Hands(max_num_hands=1, min_detection_confidence=0.7)
-    mp_drawing = mp.solutions.drawing_utils
+    hands = None
+    cap = None
 
-    # 웹캠 켜기
-    cap = cv2.VideoCapture(0)
-    cv2.namedWindow("Hand Gesture Tracking", cv2.WINDOW_NORMAL)
+    try:
+        hands = mp_hands.Hands(max_num_hands=1, min_detection_confidence=0.7)
+        mp_drawing = mp.solutions.drawing_utils
 
-    # 제스처 인식 상태 초기화
-    trajectory = deque(maxlen=MAX_TRAJECTORY_LENGTH) # 손 이동 궤적 저장용
-    swipe_recognizer = SwipeRecognizer()
-    last_sent = None
-    last_time = 0
-    last_gesture = None
-    gesture_timestamp = 0
-    cooldown_remaining = 0
-    
-    gesture = "Start"
-    swipe_text = ""
+        cap = cv2.VideoCapture(0)
+        if not cap.isOpened():
+            print("카메라를 열 수 없습니다.")
+            return
 
-    while cap.isOpened(): 
-        ret, frame = cap.read()
-        if not ret: #프레임 읽기 실패 시 종료
-            break
-	
-	# 영상 좌우 반전 및 RGB로 색상 변환 (MediaPipe 처리를 위해)
-        frame = cv2.flip(frame, 1)
-        rgb = cv2.cvtColor(frame, cv2.COLOR_BGR2RGB)
-        result = hands.process(rgb)
+        cv2.namedWindow("Hand Gesture Tracking", cv2.WINDOW_NORMAL)
 
-        if result.multi_hand_landmarks:
-            for hand_landmarks in result.multi_hand_landmarks:
-            	# 손의 중심 좌표 계산 및 궤적 리스트에 추가
-                update_trajectory(trajectory, hand_landmarks.landmark, frame.shape)
-                 # 이동 경로 시각화
-                draw_trajectory_on_frame(frame, trajectory)
-		
-		# 현재 손 제스처 분석 및 실행
-                gesture, gesture_timestamp = process_hand_gesture(
-                    hand_landmarks.landmark,
-                    trajectory,
-                    gesture_timestamp,
-                    GESTURE_HOLD_DURATION,
-                    os_name
-                )
-		
-		# 인식된 제스처 기록 (마지막 제스처 업데이트)
-                if gesture:
-                    last_gesture = gesture
-                    
-		# 손 랜드마크 연결선 시각화
-                mp_drawing.draw_landmarks(frame, hand_landmarks, mp_hands.HAND_CONNECTIONS)
+        # 제스처 인식 상태 초기화
+        trajectory = deque(maxlen=MAX_TRAJECTORY_LENGTH) # 손 이동 궤적 저장용
+        swipe_recognizer = SwipeRecognizer()
+        last_sent = None
+        last_time = 0
+        last_gesture = None
+        gesture_timestamp = 0
+        cooldown_remaining = 0
 
-        # 소켓 전송 (일반 제스처)
-        #last_sent, last_time = send_gesture_via_socket(gesture, False, last_sent, last_time)
+        gesture = "Start"
+        swipe_text = ""
 
-        # 소켓 전송 (스와이프 제스처)
-        #if swipe_text:
-        #    last_sent, last_time = send_gesture_via_socket(swipe_text, True, last_sent, last_time)
+        while cap.isOpened():
+            ret, frame = cap.read()
+            if not ret: #프레임 읽기 실패 시 종료
+                break
 
-    
-        # 결과 화면 출력
-        if gesture:
-            frame = overlay_png(frame, gesture, 300, 150)
-            cv2.putText(frame, gesture, (50, 60), cv2.FONT_HERSHEY_SIMPLEX, 1.2, (0, 0, 255), 2)
-            description = instructions.get(gesture, "")
-            cv2.putText(frame, description, (50, 110), cv2.FONT_HERSHEY_SIMPLEX, 1.2, (0, 255, 0), 2)
-    
-        cooldown_remaining = GESTURE_HOLD_DURATION - (time.time() - gesture_timestamp)
-        if cooldown_remaining > 0:
-            cooldown_timer_text = f"Cooldown: {cooldown_remaining:.1f}s"
-            cv2.putText(frame, cooldown_timer_text, (50, 200), cv2.FONT_HERSHEY_SIMPLEX, 1.0, (255, 255, 0), 2)
+            # 영상 좌우 반전 및 RGB로 색상 변환 (MediaPipe 처리를 위해)
+            frame = cv2.flip(frame, 1)
+            rgb = cv2.cvtColor(frame, cv2.COLOR_BGR2RGB)
+            result = hands.process(rgb)
 
-        show_guidline(frame)
-        cv2.imshow("Hand Gesture Tracking", frame)
+            if result.multi_hand_landmarks:
+                for hand_landmarks in result.multi_hand_landmarks:
+                    # 손의 중심 좌표 계산 및 궤적 리스트에 추가
+                    update_trajectory(trajectory, hand_landmarks.landmark, frame.shape)
+                    # 이동 경로 시각화
+                    draw_trajectory_on_frame(frame, trajectory)
 
-        if cv2.waitKey(1) & 0xFF == ord("q"):
-            break
-        if cv2.getWindowProperty("Hand Gesture Tracking", cv2.WND_PROP_VISIBLE) < 1:
-            break
+                    # 현재 손 제스처 분석 및 실행
+                    gesture, gesture_timestamp = process_hand_gesture(
+                        hand_landmarks.landmark,
+                        trajectory,
+                        gesture_timestamp,
+                        GESTURE_HOLD_DURATION,
+                        os_name
+                    )
 
+                    # 인식된 제스처 기록 (마지막 제스처 업데이트)
+                    if gesture:
+                        last_gesture = gesture
 
-    cap.release()
-    cv2.destroyAllWindows()
+                    # 손 랜드마크 연결선 시각화
+                    mp_drawing.draw_landmarks(frame, hand_landmarks, mp_hands.HAND_CONNECTIONS)
+
+            # 소켓 전송 (일반 제스처)
+            #last_sent, last_time = send_gesture_via_socket(gesture, False, last_sent, last_time)
+
+            # 소켓 전송 (스와이프 제스처)
+            #if swipe_text:
+            #    last_sent, last_time = send_gesture_via_socket(swipe_text, True, last_sent, last_time)
+
+            # 결과 화면 출력
+            if gesture:
+                frame = overlay_png(frame, gesture, 300, 150)
+                cv2.putText(frame, gesture, (50, 60), cv2.FONT_HERSHEY_SIMPLEX, 1.2, (0, 0, 255), 2)
+                description = instructions.get(gesture, "")
+                cv2.putText(frame, description, (50, 110), cv2.FONT_HERSHEY_SIMPLEX, 1.2, (0, 255, 0), 2)
+
+            cooldown_remaining = GESTURE_HOLD_DURATION - (time.time() - gesture_timestamp)
+            if cooldown_remaining > 0:
+                cooldown_timer_text = f"Cooldown: {cooldown_remaining:.1f}s"
+                cv2.putText(frame, cooldown_timer_text, (50, 200), cv2.FONT_HERSHEY_SIMPLEX, 1.0, (255, 255, 0), 2)
+
+            show_guidline(frame)
+            cv2.imshow("Hand Gesture Tracking", frame)
+
+            if cv2.waitKey(1) & 0xFF == ord("q"):
+                break
+            if cv2.getWindowProperty("Hand Gesture Tracking", cv2.WND_PROP_VISIBLE) < 1:
+                break
+
+    finally:
+        # 자원 해제
+        if hands:
+            hands.close()  # MediaPipe 리소스 해제
+        if cap:
+            cap.release()  # 카메라 해제
+        cv2.destroyAllWindows()  # 모든 창 닫기
+
 
 
 if __name__ == "__main__":
