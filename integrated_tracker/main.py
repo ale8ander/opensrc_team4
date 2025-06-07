@@ -22,7 +22,7 @@ from emoji import overlay_png
 MAX_TRAJECTORY_LENGTH = 20
 GESTURE_HOLD_DURATION = 3
 SEND_INTERVAL = 0.5
-USER_INACTIVITY_TIME = 5
+USER_INACTIVITY_TIME = 10
 
 # 운영체제 확인
 def check_OS():

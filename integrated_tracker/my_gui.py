@@ -44,19 +44,52 @@ def check_user_inactivity(frame, last_active, USER_INACTIVITY_TIME):
 
     if now - last_active > USER_INACTIVITY_TIME:
         h, w, _ = frame.shape
-        # Restart button
         # Restart 버튼 그리기
-        r_x1, r_y1 = int(w/2) - 140, int(h/2) - 40
-        r_x2, r_y2 = int(w/2) - 20, int(h/2) + 30
-        cv2.rectangle(frame, (r_x1, r_y1), (r_x2, r_y2), (0, 200, 0), -1)
-        cv2.putText(frame, "Restart", (r_x1 + 5, r_y1 + 40), cv2.FONT_HERSHEY_SIMPLEX, 1, (255,255,255), 2)
+        r_x1 = int(w * 0.4)
+        r_x2 = int(w * 0.5)
+        r_y1 = int(h * 0.45)
+        r_y2 = int(h * 0.55)
 
-        # Quit button
+        # 박스 그리기
+        cv2.rectangle(frame, (r_x1, r_y1), (r_x2, r_y2), (0, 200, 0), -1)
+        
+        # 텍스트 크기 계산
+        text = "Restart"
+        font_scale = 1
+        thickness = 2
+        text_size, _ = cv2.getTextSize(text, cv2.FONT_HERSHEY_SIMPLEX, font_scale, thickness)
+        text_width, text_height = text_size
+        
+        # 중앙 정렬
+        text_x = r_x1 + (r_x2 - r_x1 - text_width) // 2
+        text_y = r_y1 + (r_y2 - r_y1 + text_height) // 2
+        
+        
+        cv2.putText(frame, text, (text_x, text_y), cv2.FONT_HERSHEY_SIMPLEX, font_scale, (255, 255, 255), thickness)
+
+        # ==========
+        
         # Quit 버튼 그리기
-        q_x1, q_y1 = int(w/2) + 20, int(h/2) - 40
-        q_x2, q_y2 = int(w/2) + 120, int(h/2) + 30
+        q_x1 = int(w * 0.55)
+        q_x2 = int(w * 0.65)
+        q_y1 = int(h * 0.45)
+        q_y2 = int(h * 0.55)
+        
+        # 박스 그리기
         cv2.rectangle(frame, (q_x1, q_y1), (q_x2, q_y2), (0, 0, 200), -1)
-        cv2.putText(frame, "Quit", (q_x1 + 20, q_y1 + 40), cv2.FONT_HERSHEY_SIMPLEX, 1, (255,255,255), 2)
+        
+        # 텍스트 크기 계산
+        text = "Quit"
+        font_scale = 1
+        thickness = 2
+        text_size, _ = cv2.getTextSize(text, cv2.FONT_HERSHEY_SIMPLEX, font_scale, thickness)
+        text_width, text_height = text_size
+        
+        # 중앙 정렬
+        text_x = q_x1 + (q_x2 - q_x1 - text_width) // 2
+        text_y = q_y1 + (q_y2 - q_y1 + text_height) // 2
+        
+        cv2.putText(frame, text, (text_x, text_y), cv2.FONT_HERSHEY_SIMPLEX, font_scale, (255, 255, 255), thickness)
 
         # 버튼 좌표와 비활성화 시간 반환
         return (r_x1, r_y1, r_x2, r_y2), (q_x1, q_y1, q_x2, q_y2), now - last_active
@@ -72,9 +105,25 @@ def draw_quit_button(frame):
     화면 우측 상단에 'Quit' 버튼을 그려 마우스 클릭으로 종료할 수 있도록 합니다.
     """
     h, w, _ = frame.shape
-    x1, y1 = w - 110, h - 60
-    x2, y2 = w - 10, h - 10
+    x1 = int(w * 0.90)
+    x2 = int(w * 0.98)
+    y1 = int(h * 0.90)
+    y2 = int(h * 0.98)
+
+    # 박스 그리기
     cv2.rectangle(frame, (x1, y1), (x2, y2), (50, 50, 255), -1)
-    cv2.putText(frame, "Quit", (x1 + 10, y1 + 35), cv2.FONT_HERSHEY_SIMPLEX, 1, (255, 255, 255), 2)
+
+    # 텍스트 크기 계산
+    text = "Quit"
+    font_scale = 1
+    thickness = 2
+    text_size, _ = cv2.getTextSize(text, cv2.FONT_HERSHEY_SIMPLEX, font_scale, thickness)
+    text_width, text_height = text_size
+
+    # 중앙 정렬
+    text_x = x1 + (x2 - x1 - text_width) // 2
+    text_y = y1 + (y2 - y1 + text_height) // 2 
+
+    cv2.putText(frame, text, (text_x, text_y), cv2.FONT_HERSHEY_SIMPLEX, font_scale, (255, 255, 255), thickness)
 
     return (x1, y1, x2, y2)

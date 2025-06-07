@@ -6,7 +6,8 @@ import cv2
 instructions = {
         "Victory": "Close Tab",
         "Fist": "Refresh",
-        "Open Hand": "Go Back"
+        "Open Hand": "Go Back",
+        "Thumb Up": "Quit"
         # "Swipe Right": "Tab Change",
         # "Swipe Left": "Tab Change",
         # "Scroll Down" : "",
@@ -71,6 +72,10 @@ def classify_gesture(landmarks, trajectory):
     thumb_extended = landmarks[4].x > landmarks[3].x
     finger_count = len(extended_fingers)
 
+    # Add Thumb Up gesture detection
+    if thumb_extended and finger_count == 0:
+        return "Thumb Up"
+
     if finger_count == 0:
         return "Fist"
     elif finger_count >= 4 and thumb_extended:
@@ -114,6 +119,7 @@ def execute_gesture_action(gesture, os_name):
         "Victory": ('alt', 'f4') if os_name else ('command', 'w'),
         "Fist": ('ctrl', 'r') if os_name else ('command', 'r'), 
         "Open Hand": ('alt', 'left') if os_name else ('command', '['),
+        "Thumb Up": ('command', 'q') if os_name == 0 else ('alt', 'f4'),
     }
 
     if gesture in keymap:
