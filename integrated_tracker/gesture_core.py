@@ -6,11 +6,12 @@ import cv2
 instructions = {
         "Victory": "Close Tab",
         "Fist": "Refresh",
-        "Open Hand": "Go Back"
-        # "Swipe Right": "Tab Change",
-        # "Swipe Left": "Tab Change",
-        # "Scroll Down" : "",
-        # "Scroll Up" : ""
+        "Open Hand": "Go Back",
+        "Pointing": "Ready to Swipe",
+        "Swipe Right": "Next Tab",
+        "Swipe Left": "Previous Tab",
+        "Scroll Up": "Scroll Up",
+        "Scroll Down": "Scroll Down"
     }
 
 # 손가락 펼쳐졌는지 판단
@@ -40,13 +41,14 @@ def is_extended(tip, pip, landmarks):
 
 # 손 모양으로 제스처 분류
 # 원래 scroll, swipe 기능까지 구현했으나, mediapipe 인식 한계 상 가위, 바위, 보로 한정함
-def classify_gesture(landmarks, trajectory):
+def classify_gesture(landmarks, trajectory, last_gesture=None):
     """
     Classify the hand gesture based on finger landmarks and trajectory.
 
     Args:
         landmarks (List): List of hand landmarks.
         trajectory (deque): Recent movement trajectory of the hand.
+        last_gesture (str, optional): The last recognized gesture. Defaults to None.
 
     Returns:
         str or None: The name of the gesture, or None if not recognized.
@@ -56,6 +58,7 @@ def classify_gesture(landmarks, trajectory):
     인자:
         landmarks (List): 손 랜드마크 리스트
         trajectory (deque): 최근 손의 이동 경로
+        last_gesture (str, optional): The last recognized gesture. Defaults to None.
 
     반환:
         str 또는 None: 인식된 제스처 이름, 또는 인식되지 않으면 None
@@ -71,7 +74,31 @@ def classify_gesture(landmarks, trajectory):
     thumb_extended = landmarks[4].x > landmarks[3].x
     finger_count = len(extended_fingers)
 
-    if finger_count == 0:
+    # Priority check for scroll gesture after pointing to avoid conflict with Fist
+    if last_gesture == "Pointing" and finger_count == 0:
+        if len(trajectory) >= 5:
+            start_y = trajectory[0][1]
+            end_y = trajectory[-1][1]
+            dy = end_y - start_y
+            
+            start_x = trajectory[0][0]
+            end_x = trajectory[-1][0]
+            dx = end_x - start_x
+
+            # Check for significant vertical movement
+            if abs(dy) > abs(dx) and abs(dy) > 30:
+                return "Scroll Down" if dy > 0 else "Scroll Up"
+
+    if finger_count == 1 and 'index' in extended_fingers:
+        if len(trajectory) >= 10:
+            dx = trajectory[-1][0] - trajectory[0][0]
+            dy = trajectory[-1][1] - trajectory[0][1]
+            if abs(dx) > 60 and abs(dx) > abs(dy):
+                return "Swipe Right" if dx > 0 else "Swipe Left"
+            if abs(dy) > 60 and abs(dy) > abs(dx):
+                return "Scroll Down" if dy > 0 else "Scroll Up"
+        return "Pointing"
+    elif finger_count == 0:
         return "Fist"
     elif finger_count >= 4 and thumb_extended:
         return "Open Hand"
@@ -106,11 +133,16 @@ def execute_gesture_action(gesture, os_name):
         gesture (str): 인식된 제스처 이름
         os_name (int): 운영체제 코드 (1: Windows, 0: macOS)
     """
+    if gesture == "Scroll Up":
+        pyautogui.scroll(100)
+        return
+    if gesture == "Scroll Down":
+        pyautogui.scroll(-100)
+        return
+
     keymap = {
-        # "Swipe Right": ('alt', 'tab') if os_name else ('command', 'tab'),
-        # "Swipe Left": ('alt', 'shift', 'tab') if os_name else ('command', 'shift', 'tab'),
-        # "Scroll Up": 300,
-        # "Scroll Down": -300,
+        "Swipe Right": ('ctrl', 'tab') if os_name else ('command', 'shift', ']'),
+        "Swipe Left": ('ctrl', 'shift', 'tab') if os_name else ('command', 'shift', '['),
         "Victory": ('alt', 'f4') if os_name else ('command', 'w'),
         "Fist": ('ctrl', 'r') if os_name else ('command', 'r'), 
         "Open Hand": ('alt', 'left') if os_name else ('command', '['),
@@ -118,8 +150,6 @@ def execute_gesture_action(gesture, os_name):
 
     if gesture in keymap:
         pyautogui.hotkey(*keymap[gesture])
-    # elif "Scroll" in gesture: # 해당 부분 logic 사용 시 수정 필요
-    #    pyautogui.scroll(keymap[gesture])
 
 def update_trajectory(trajectory, hand_landmarks, frame_shape):
     """
@@ -141,6 +171,31 @@ def update_trajectory(trajectory, hand_landmarks, frame_shape):
     h, w, _ = frame_shape
     cx = int(np.mean([lm.x * w for lm in hand_landmarks]))
     cy = int(np.mean([lm.y * h for lm in hand_landmarks]))
+    trajectory.append((cx, cy))
+    return cx, cy
+
+
+def update_fingertip_trajectory(trajectory, hand_landmarks, frame_shape):
+    """
+    Calculate the position of the index fingertip and append it to the trajectory.
+
+    Args:
+        trajectory (deque): A deque storing recent hand center positions.
+        hand_landmarks (List[Landmark]): List of 21 hand landmark points.
+        frame_shape (tuple): Shape of the frame (height, width, channels).
+
+    Returns:
+        tuple: The calculated center (cx, cy) of the hand.
+
+    검지손가락 랜드마크를 기반으로 손가락 위치를 계산하여 trajectory에 저장합니다.
+
+    반환:
+        tuple: 손가락 위치 좌표 (cx, cy)
+    """
+    h, w, _ = frame_shape
+    fingertip = hand_landmarks[8] # Index finger tip
+    cx = int(fingertip.x * w)
+    cy = int(fingertip.y * h)
     trajectory.append((cx, cy))
     return cx, cy
 
@@ -179,7 +234,7 @@ def should_update_gesture(gesture_timestamp, hold_duration):
     return cooldown_remaining <= 0
 
 
-def process_hand_gesture(hand_landmarks, trajectory, gesture_timestamp, hold_duration, os_name):
+def process_hand_gesture(hand_landmarks, trajectory, gesture_timestamp, hold_duration, os_name, last_gesture=None):
     """
     Determine the gesture from current hand data and handle cooldown logic.
 
@@ -189,6 +244,7 @@ def process_hand_gesture(hand_landmarks, trajectory, gesture_timestamp, hold_dur
         gesture_timestamp (float): Timestamp of last gesture recognition.
         hold_duration (float): Cooldown duration in seconds.
         os_name (int): OS identifier (1: Windows, 0: macOS, -1: others)
+        last_gesture (str, optional): The last recognized gesture. Defaults to None.
 
     Returns:
         tuple: (recognized gesture or None, updated gesture_timestamp)
@@ -198,12 +254,15 @@ def process_hand_gesture(hand_landmarks, trajectory, gesture_timestamp, hold_dur
     반환:
         tuple: (인식된 제스처 or None, 갱신된 gesture_timestamp)
     """
-    gesture_candidate = classify_gesture(hand_landmarks, trajectory)
+    gesture_candidate = classify_gesture(hand_landmarks, trajectory, last_gesture)
 
     if should_update_gesture(gesture_timestamp, hold_duration):
-        if gesture_candidate:
+        if gesture_candidate and gesture_candidate != "Pointing":
             gesture_timestamp = time.time()
             execute_gesture_action(gesture_candidate, os_name)
+            return gesture_candidate, gesture_timestamp
+        elif gesture_candidate == "Pointing":
+            # Don't reset timestamp for pointing, to allow quick swipes
             return gesture_candidate, gesture_timestamp
 
     return None, gesture_timestamp

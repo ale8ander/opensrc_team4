@@ -9,7 +9,8 @@ from gesture_core import (
     instructions,
     update_trajectory,
     draw_trajectory_on_frame,
-    process_hand_gesture
+    process_hand_gesture,
+    update_fingertip_trajectory
 )
 from my_gui import show_guidline
 from recognizer import SwipeRecognizer
@@ -116,6 +117,7 @@ def track():
         last_gesture = None
         gesture_timestamp = 0
         cooldown_remaining = 0
+        is_pointing = False
 
         gesture = "Start"
         swipe_text = ""
@@ -132,10 +134,8 @@ def track():
 
             if result.multi_hand_landmarks:
                 for hand_landmarks in result.multi_hand_landmarks:
-                    # 손의 중심 좌표 계산 및 궤적 리스트에 추가
-                    update_trajectory(trajectory, hand_landmarks.landmark, frame.shape)
-                    # 이동 경로 시각화
-                    draw_trajectory_on_frame(frame, trajectory)
+                    # 이전 제스처가 포인팅이었는지 확인
+                    was_pointing = is_pointing
 
                     # 현재 손 제스처 분석 및 실행
                     gesture, gesture_timestamp = process_hand_gesture(
@@ -143,8 +143,25 @@ def track():
                         trajectory,
                         gesture_timestamp,
                         GESTURE_HOLD_DURATION,
-                        os_name
+                        os_name,
+                        last_gesture
                     )
+
+                    # 포인팅 상태 업데이트
+                    is_pointing = (gesture == "Pointing")
+
+                    # 포인팅 상태가 변경되면 궤적 초기화
+                    if was_pointing != is_pointing:
+                        trajectory.clear()
+
+                    # 궤적 업데이트
+                    if is_pointing:
+                        update_fingertip_trajectory(trajectory, hand_landmarks.landmark, frame.shape)
+                    else:
+                        update_trajectory(trajectory, hand_landmarks.landmark, frame.shape)
+                    
+                    # 이동 경로 시각화
+                    draw_trajectory_on_frame(frame, trajectory)
 
                     # 인식된 제스처 기록 (마지막 제스처 업데이트)
                     if gesture:
@@ -152,6 +169,12 @@ def track():
 
                     # 손 랜드마크 연결선 시각화
                     mp_drawing.draw_landmarks(frame, hand_landmarks, mp_hands.HAND_CONNECTIONS)
+            
+            else:
+                # 손이 감지되지 않으면 상태 초기화
+                trajectory.clear()
+                is_pointing = False
+                gesture = None
 
             # 소켓 전송 (일반 제스처)
             #last_sent, last_time = send_gesture_via_socket(gesture, False, last_sent, last_time)
