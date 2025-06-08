@@ -1,5 +1,4 @@
 import cv2
-import json
 import mediapipe as mp
 import time
 import platform
@@ -11,7 +10,11 @@ from gesture_core import (
     draw_trajectory_on_frame,
     process_hand_gesture
 )
-from my_gui import show_guidline
+from my_gui import (
+    show_guidline,
+    check_user_inactivity,
+    draw_quit_button
+)
 from recognizer import SwipeRecognizer
 from emoji import overlay_png
 #from my_socket import send_to_handler
@@ -19,16 +22,7 @@ from emoji import overlay_png
 MAX_TRAJECTORY_LENGTH = 20
 GESTURE_HOLD_DURATION = 3
 SEND_INTERVAL = 0.5
-
-'''
-<issue>
-- 종료 조건
-- OS 판단 => 제대로 동작하는지 확인 필요: completed 
-- 사용자가 필요할 때만 킬 수 있게끔 GUI를 구성
-- OpenHand 인식률 떨어짐
-
-+ mac일 경우 권한설정 먼저 바꿔줘야함
-'''
+USER_INACTIVITY_TIME = 5
 
 # 운영체제 확인
 def check_OS():
@@ -92,6 +86,17 @@ def track():
     # OS 확인
     os_name = check_OS()
 
+    # macOS 권한 체크 경고 (권한 없을 경우만 출력)
+    if os_name == 0:
+        test_cam = cv2.VideoCapture(0)
+        if not test_cam.isOpened():
+            print("\n[Permission Warning]")
+            print("웹캠 권한이 macOS에서 차단되어 있을 수 있습니다.")
+            print("시스템 환경설정 > 보안 및 개인정보 보호 > 카메라에서 Python 또는 터미널 앱에 권한을 부여하세요.\n")
+        test_cam.release()
+    
+
+
     # MediaPipe 및 카메라 초기화
     mp_hands = mp.solutions.hands
     hands = None
@@ -120,6 +125,27 @@ def track():
         gesture = "Start"
         swipe_text = ""
 
+        last_active = time.time()
+        restart_flag = [False]
+        exit_flag = [False]
+
+        quit_box = None
+        restart_box = None
+
+        def mouse_callback(event, x, y, flags, param):
+            if event == cv2.EVENT_LBUTTONDOWN:
+                if quit_box:
+                    x1, y1, x2, y2 = quit_box
+                    if x1 <= x <= x2 and y1 <= y <= y2:
+                        exit_flag[0] = True
+                if restart_box:
+                    rx1, ry1, rx2, ry2 = restart_box
+                    if rx1 <= x <= rx2 and ry1 <= y <= ry2:
+                        restart_flag[0] = True
+
+        cv2.setMouseCallback("Hand Gesture Tracking", mouse_callback)
+
+
         while cap.isOpened():
             ret, frame = cap.read()
             if not ret: #프레임 읽기 실패 시 종료
@@ -143,7 +169,8 @@ def track():
                         trajectory,
                         gesture_timestamp,
                         GESTURE_HOLD_DURATION,
-                        os_name
+                        os_name,
+                        last_gesture
                     )
 
                     # 인식된 제스처 기록 (마지막 제스처 업데이트)
@@ -152,9 +179,6 @@ def track():
 
                     # 손 랜드마크 연결선 시각화
                     mp_drawing.draw_landmarks(frame, hand_landmarks, mp_hands.HAND_CONNECTIONS)
-
-            # 소켓 전송 (일반 제스처)
-            #last_sent, last_time = send_gesture_via_socket(gesture, False, last_sent, last_time)
 
             # 소켓 전송 (스와이프 제스처)
             #if swipe_text:
@@ -173,7 +197,27 @@ def track():
                 cv2.putText(frame, cooldown_timer_text, (50, 200), cv2.FONT_HERSHEY_SIMPLEX, 1.0, (255, 255, 0), 2)
 
             show_guidline(frame)
+                    
+            # 'Quit' 버튼 그리기
+            quit_box = draw_quit_button(frame)
+
+            # Check user inactivity and show Restart/Quit if needed
+            restart_box, quit_box_inactive, inactive_duration = check_user_inactivity(frame, last_active, USER_INACTIVITY_TIME)
+            if quit_box_inactive:
+                # Turn off webcam frame (blackout)
+                frame[:] = 0
+                # Draw restart and quit buttons on black background
+                restart_box, quit_box, _ = check_user_inactivity(frame, last_active, USER_INACTIVITY_TIME)
+
             cv2.imshow("Hand Gesture Tracking", frame)
+
+            if exit_flag[0]:
+                break
+            if restart_flag[0]:
+                cap.release()
+                cv2.destroyAllWindows()
+                track()
+                return
 
             if cv2.waitKey(1) & 0xFF == ord("q"):
                 break
@@ -187,7 +231,6 @@ def track():
         if cap:
             cap.release()  # 카메라 해제
         cv2.destroyAllWindows()  # 모든 창 닫기
-
 
 
 if __name__ == "__main__":

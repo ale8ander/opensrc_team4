@@ -179,7 +179,7 @@ def should_update_gesture(gesture_timestamp, hold_duration):
     return cooldown_remaining <= 0
 
 
-def process_hand_gesture(hand_landmarks, trajectory, gesture_timestamp, hold_duration, os_name):
+def process_hand_gesture(hand_landmarks, trajectory, gesture_timestamp, hold_duration, os_name, last_gesture):
     """
     Determine the gesture from current hand data and handle cooldown logic.
 
@@ -189,14 +189,13 @@ def process_hand_gesture(hand_landmarks, trajectory, gesture_timestamp, hold_dur
         gesture_timestamp (float): Timestamp of last gesture recognition.
         hold_duration (float): Cooldown duration in seconds.
         os_name (int): OS identifier (1: Windows, 0: macOS, -1: others)
+        last_gesture (str or None): The last confirmed gesture.
 
     Returns:
-        tuple: (recognized gesture or None, updated gesture_timestamp)
+        tuple: (gesture to display, updated gesture_timestamp)
 
     현재 손 상태로부터 제스처를 판단하고, 쿨다운 조건을 충족하면 제스처를 실행합니다.
-
-    반환:
-        tuple: (인식된 제스처 or None, 갱신된 gesture_timestamp)
+    그렇지 않으면 이전 제스처를 유지합니다.
     """
     gesture_candidate = classify_gesture(hand_landmarks, trajectory)
 
@@ -205,5 +204,4 @@ def process_hand_gesture(hand_landmarks, trajectory, gesture_timestamp, hold_dur
             gesture_timestamp = time.time()
             execute_gesture_action(gesture_candidate, os_name)
             return gesture_candidate, gesture_timestamp
-
-    return None, gesture_timestamp
+    return last_gesture, gesture_timestamp

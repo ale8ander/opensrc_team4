@@ -1,4 +1,5 @@
 import cv2
+import time
 from gesture_core import instructions
 
 # 화면 우측 가이드 라인 제공
@@ -18,3 +19,62 @@ def show_guidline(frame):
             header_x = frame_width - header_width - 70
             cv2.putText(frame, header, (header_x, 30 + i * 30), cv2.FONT_HERSHEY_SIMPLEX, 1.2, (0, 255, 0), 2)
         cv2.putText(frame, line, (x, y), cv2.FONT_HERSHEY_SIMPLEX, 1.2, (0, 255, 0), 2)
+
+def check_user_inactivity(frame, last_active, USER_INACTIVITY_TIME):
+    """
+    Check if user has been inactive for more than 30 seconds and display Restart/Quit buttons.
+
+    Args:
+        frame (ndarray): Current video frame.
+        last_active (float): Timestamp of the last user interaction.
+
+    Returns:
+        tuple: Coordinates of restart and quit buttons for click detection.
+
+    사용자가 30초 이상 아무런 동작을 하지 않았는지 확인하고,
+    'Restart' 및 'Quit' 버튼을 화면에 표시합니다.
+
+    반환:
+        tuple: 클릭 감지를 위한 Restart 및 Quit 버튼의 좌표
+    """
+    now = time.time()
+    # Display remaining time until inactivity if still active
+    remaining_time = max(0, USER_INACTIVITY_TIME - (now - last_active))
+    cv2.putText(frame, f"Inactive in: {remaining_time:.1f}s", (50, 250), cv2.FONT_HERSHEY_SIMPLEX, 0.9, (100, 255, 255), 2)
+
+    if now - last_active > USER_INACTIVITY_TIME:
+        h, w, _ = frame.shape
+        # Restart button
+        # Restart 버튼 그리기
+        r_x1, r_y1 = int(w/2) - 140, int(h/2) - 40
+        r_x2, r_y2 = int(w/2) - 20, int(h/2) + 30
+        cv2.rectangle(frame, (r_x1, r_y1), (r_x2, r_y2), (0, 200, 0), -1)
+        cv2.putText(frame, "Restart", (r_x1 + 5, r_y1 + 40), cv2.FONT_HERSHEY_SIMPLEX, 1, (255,255,255), 2)
+
+        # Quit button
+        # Quit 버튼 그리기
+        q_x1, q_y1 = int(w/2) + 20, int(h/2) - 40
+        q_x2, q_y2 = int(w/2) + 120, int(h/2) + 30
+        cv2.rectangle(frame, (q_x1, q_y1), (q_x2, q_y2), (0, 0, 200), -1)
+        cv2.putText(frame, "Quit", (q_x1 + 20, q_y1 + 40), cv2.FONT_HERSHEY_SIMPLEX, 1, (255,255,255), 2)
+
+        # 버튼 좌표와 비활성화 시간 반환
+        return (r_x1, r_y1, r_x2, r_y2), (q_x1, q_y1, q_x2, q_y2), now - last_active
+    return None, None, 0
+
+def draw_quit_button(frame):
+    """
+    Draw a clickable 'Quit' button on the frame.
+
+    Args:
+        frame (ndarray): The image frame to draw the button on.
+
+    화면 우측 상단에 'Quit' 버튼을 그려 마우스 클릭으로 종료할 수 있도록 합니다.
+    """
+    h, w, _ = frame.shape
+    x1, y1 = w - 110, h - 60
+    x2, y2 = w - 10, h - 10
+    cv2.rectangle(frame, (x1, y1), (x2, y2), (50, 50, 255), -1)
+    cv2.putText(frame, "Quit", (x1 + 10, y1 + 35), cv2.FONT_HERSHEY_SIMPLEX, 1, (255, 255, 255), 2)
+
+    return (x1, y1, x2, y2)
