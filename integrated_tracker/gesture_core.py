@@ -11,7 +11,8 @@ instructions = {
         "Swipe Right": "Next Tab",
         "Swipe Left": "Previous Tab",
         "Scroll Up": "Scroll Up",
-        "Scroll Down": "Scroll Down"
+        "Scroll Down": "Scroll Down",
+        "Thumb Up": "Quit"
     }
 
 # 손가락 펼쳐졌는지 판단
@@ -74,6 +75,7 @@ def classify_gesture(landmarks, trajectory, last_gesture=None):
     thumb_extended = landmarks[4].x > landmarks[3].x
     finger_count = len(extended_fingers)
 
+<<<<<<< HEAD
     # Priority check for scroll gesture after pointing to avoid conflict with Fist
     if last_gesture == "Pointing" and finger_count == 0:
         if len(trajectory) >= 5:
@@ -98,7 +100,11 @@ def classify_gesture(landmarks, trajectory, last_gesture=None):
             if abs(dy) > 60 and abs(dy) > abs(dx):
                 return "Scroll Down" if dy > 0 else "Scroll Up"
         return "Pointing"
-    elif finger_count == 0:
+    # Add Thumb Up gesture detection
+    if thumb_extended and finger_count == 0:
+        return "Thumb Up"
+
+    if finger_count == 0:
         return "Fist"
     elif finger_count >= 4 and thumb_extended:
         return "Open Hand"
@@ -146,6 +152,7 @@ def execute_gesture_action(gesture, os_name):
         "Victory": ('alt', 'f4') if os_name else ('command', 'w'),
         "Fist": ('ctrl', 'r') if os_name else ('command', 'r'), 
         "Open Hand": ('alt', 'left') if os_name else ('command', '['),
+        "Thumb Up": ('command', 'q') if os_name == 0 else ('alt', 'f4'),
     }
 
     if gesture in keymap:

@@ -1,12 +1,13 @@
 import os
 import cv2
+BASE_DIR = os.path.dirname(os.path.abspath(__file__))
 
 emoji_img_paths = {
-    "Swipe Right": "emojis/swipe_right.png",
-    "Swipe Left": "emojis/swipe_left.png",
-    "Fist": "emojis/fist.png",
-    "Open Hand": "emojis/open_hand.png",
-    "Victory": "emojis/victory.png",
+    "Swipe Right": os.path.join(BASE_DIR, "emojis/swipe_right.png"),
+    "Swipe Left": os.path.join(BASE_DIR, "emojis/swipe_left.png"),
+    "Fist": os.path.join(BASE_DIR, "emojis/fist.png"),
+    "Open Hand": os.path.join(BASE_DIR, "emojis/open_hand.png"),
+    "Victory": os.path.join(BASE_DIR, "emojis/victory.png")
 }
 
 emoji_cache = {
