@@ -44,6 +44,7 @@ def check_user_inactivity(frame, last_active, USER_INACTIVITY_TIME):
 
     if now - last_active > USER_INACTIVITY_TIME:
         h, w, _ = frame.shape
+        
         # Restart 버튼 그리기
         r_x1 = int(w * 0.4)
         r_x2 = int(w * 0.5)
@@ -105,6 +106,7 @@ def draw_quit_button(frame):
     화면 우측 상단에 'Quit' 버튼을 그려 마우스 클릭으로 종료할 수 있도록 합니다.
     """
     h, w, _ = frame.shape
+
     x1 = int(w * 0.90)
     x2 = int(w * 0.98)
     y1 = int(h * 0.90)
