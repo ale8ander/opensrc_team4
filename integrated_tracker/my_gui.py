@@ -1,6 +1,11 @@
+import os
 import cv2
 import time
 from gesture_core import instructions
+
+BASE_DIR = os.path.dirname(os.path.abspath(__file__))
+intro_path = os.path.join(BASE_DIR, "../icon/start.png")
+
 
 # 화면 우측 가이드 라인 제공
 def show_guidline(frame):
@@ -129,3 +134,27 @@ def draw_quit_button(frame):
     cv2.putText(frame, text, (text_x, text_y), cv2.FONT_HERSHEY_SIMPLEX, font_scale, (255, 255, 255), thickness)
 
     return (x1, y1, x2, y2)
+
+
+
+def show_intro_image(relative_path, duration=3):
+    """
+    현재 파일(my_gui.py) 기준으로 상대 경로를 보정해 이미지 표시
+    """
+    # my_gui.py 기준으로 경로 해석
+    base_dir = os.path.dirname(os.path.abspath(__file__))
+    image_path = os.path.abspath(os.path.join(base_dir, relative_path))
+
+    if not os.path.exists(image_path):
+        print(f"[경고] 인트로 이미지 파일 없음: {image_path}")
+        return
+
+    intro_img = cv2.imread(image_path)
+    if intro_img is None:
+        print(f"[경고] 인트로 이미지 로드 실패: {image_path}")
+        return
+
+    cv2.namedWindow("Hand Gesture Tracking", cv2.WINDOW_NORMAL)
+    cv2.imshow("Hand Gesture Tracking", intro_img)
+    cv2.waitKey(duration * 1000)
+    cv2.destroyWindow("Hand Gesture Tracking")
