@@ -85,6 +85,7 @@ def track():
     """
     # OS 확인
     os_name = check_OS()
+
     # macOS 권한 체크 경고 (권한 없을 경우만 출력)
     if os_name == 0:
         test_cam = cv2.VideoCapture(0)
@@ -94,6 +95,7 @@ def track():
             print("시스템 환경설정 > 보안 및 개인정보 보호 > 카메라에서 Python 또는 터미널 앱에 권한을 부여하세요.\n")
         test_cam.release()
     
+
 
     # MediaPipe 및 카메라 초기화
     mp_hands = mp.solutions.hands
@@ -110,7 +112,7 @@ def track():
             return
 
         cv2.namedWindow("Hand Gesture Tracking", cv2.WINDOW_NORMAL)
-        
+
         # 제스처 인식 상태 초기화
         trajectory = deque(maxlen=MAX_TRAJECTORY_LENGTH) # 손 이동 궤적 저장용
         swipe_recognizer = SwipeRecognizer()
@@ -142,6 +144,7 @@ def track():
                         restart_flag[0] = True
 
         cv2.setMouseCallback("Hand Gesture Tracking", mouse_callback)
+
 
         while cap.isOpened():
             ret, frame = cap.read()
@@ -227,7 +230,8 @@ def track():
             hands.close()  # MediaPipe 리소스 해제
         if cap:
             cap.release()  # 카메라 해제
-        cv2.destroyAllWindows()  # 모든 창 닫기r
+        cv2.destroyAllWindows()  # 모든 창 닫기
+
 
 if __name__ == "__main__":
     track()
