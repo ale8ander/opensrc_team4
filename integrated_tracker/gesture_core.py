@@ -247,12 +247,10 @@ def process_hand_gesture(hand_landmarks, trajectory, gesture_timestamp, hold_dur
         last_gesture (str, optional): The last recognized gesture. Defaults to None.
 
     Returns:
-        tuple: (recognized gesture or None, updated gesture_timestamp)
+        tuple: (gesture to display, updated gesture_timestamp)
 
     현재 손 상태로부터 제스처를 판단하고, 쿨다운 조건을 충족하면 제스처를 실행합니다.
-
-    반환:
-        tuple: (인식된 제스처 or None, 갱신된 gesture_timestamp)
+    그렇지 않으면 이전 제스처를 유지합니다.
     """
     gesture_candidate = classify_gesture(hand_landmarks, trajectory, last_gesture)
 
@@ -265,4 +263,4 @@ def process_hand_gesture(hand_landmarks, trajectory, gesture_timestamp, hold_dur
             # Don't reset timestamp for pointing, to allow quick swipes
             return gesture_candidate, gesture_timestamp
 
-    return None, gesture_timestamp
+    return last_gesture, gesture_timestamp
