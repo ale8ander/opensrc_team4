@@ -98,6 +98,7 @@ def track():
             print("시스템 환경설정 > 보안 및 개인정보 보호 > 카메라에서 Python 또는 터미널 앱에 권한을 부여하세요.\n")
         test_cam.release()
     
+    #intro show
     show_intro_image("../icon/start.png")
     
     # MediaPipe 및 카메라 초기화
