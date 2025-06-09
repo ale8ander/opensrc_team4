@@ -6,7 +6,7 @@
 *For planned features and progress, please refer to [ROADMAP.md](./docs/ROADMAP.md).*
 <div align="center">
 
-![project Team Logo](https://github.com/user-attachments/assets/85c240d1-3ec5-48cf-a7b7-afbd8764b4ad){: width="30%" height="30%"}
+![project Team Logo](./icon/start.jpg){: width="30%" height="30%"}
 
 </div>
 

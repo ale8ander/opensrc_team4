@@ -99,7 +99,7 @@ def track():
         test_cam.release()
     
     #intro show
-    show_intro_image("../icon/start.png")
+    show_intro_image("../icon/start.jpg")
     
     # MediaPipe 및 카메라 초기화
     mp_hands = mp.solutions.hands

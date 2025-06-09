@@ -3,9 +3,8 @@ import cv2
 import time
 from gesture_core import instructions
 
-#경로 설정
-BASE_DIR = os.path.dirname(os.path.abspath(__file__))
-intro_path = os.path.join(BASE_DIR, "../icon/start.png")
+# 경로 설정
+# BASE_DIR = os.path.dirname(os.path.abspath(__file__))
 
 
 # 화면 우측 가이드 라인 제공
