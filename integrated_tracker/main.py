@@ -179,6 +179,7 @@ def track():
                     # 인식된 제스처 기록 (마지막 제스처 업데이트)
                     if gesture:
                         last_gesture = gesture
+                        last_active = time.time()
 
                     # 손 랜드마크 연결선 시각화
                     mp_drawing.draw_landmarks(frame, hand_landmarks, mp_hands.HAND_CONNECTIONS)
