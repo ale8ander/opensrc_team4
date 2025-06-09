@@ -1,4 +1,5 @@
 import cv2
+import os
 import mediapipe as mp
 import time
 import platform
@@ -14,7 +15,8 @@ from gesture_core import (
 from my_gui import (
     show_guidline,
     check_user_inactivity,
-    draw_quit_button
+    draw_quit_button,
+    show_intro_image
 )
 from recognizer import SwipeRecognizer
 from emoji import overlay_png
@@ -96,6 +98,9 @@ def track():
             print("웹캠 권한이 macOS에서 차단되어 있을 수 있습니다.")
             print("시스템 환경설정 > 보안 및 개인정보 보호 > 카메라에서 Python 또는 터미널 앱에 권한을 부여하세요.\n")
         test_cam.release()
+    
+    #intro show
+    show_intro_image("../icon/start.png")
     
     # MediaPipe 및 카메라 초기화
     mp_hands = mp.solutions.hands
