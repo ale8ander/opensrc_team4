@@ -18,7 +18,10 @@ from my_gui import (
     show_intro_image
 )
 from recognizer import SwipeRecognizer
-from emoji import overlay_png
+from emoji import (
+    overlay_png,
+    overlay_face_with_emoji
+)
 #from my_socket import send_to_handler
 
 MAX_TRAJECTORY_LENGTH = 20
@@ -110,6 +113,9 @@ def track():
         hands = mp_hands.Hands(max_num_hands=1, min_detection_confidence=0.7)
         mp_drawing = mp.solutions.drawing_utils
 
+        mp_face_detection = mp.solutions.face_detection
+        face_detection = mp_face_detection.FaceDetection(min_detection_confidence=0.7)
+
         cap = cv2.VideoCapture(0)
         if not cap.isOpened():
             print("카메라를 열 수 없습니다.")
@@ -158,6 +164,9 @@ def track():
             frame = cv2.flip(frame, 1)
             rgb = cv2.cvtColor(frame, cv2.COLOR_BGR2RGB)
             result = hands.process(rgb)
+
+            face_results = face_detection.process(rgb)
+            overlay_face_with_emoji(frame, face_results)
 
             if result.multi_hand_landmarks:
                 for hand_landmarks in result.multi_hand_landmarks:
