@@ -6,7 +6,8 @@ import cv2
 instructions = {
         "Victory": "Close Tab",
         "Fist": "Refresh",
-        "Open Hand": "Go Back",
+        "Open Hand": "Go Back",,
+        "Thumb Up": "Quit"
         "Pointing": "Ready to Swipe",
         "Swipe Right": "Next Tab",
         "Swipe Left": "Previous Tab",
