@@ -18,8 +18,19 @@ from my_gui import (
     draw_quit_button,
     show_intro_image
 )
+
+from my_gui import (
+    show_guidline,
+    check_user_inactivity,
+    draw_quit_button,
+    show_intro_image
+)
+
 from recognizer import SwipeRecognizer
-from emoji import overlay_png
+from emoji import (
+    overlay_png,
+    overlay_face_with_emoji
+)
 #from my_socket import send_to_handler
 
 MAX_TRAJECTORY_LENGTH = 20
@@ -111,6 +122,9 @@ def track():
         hands = mp_hands.Hands(max_num_hands=1, min_detection_confidence=0.7)
         mp_drawing = mp.solutions.drawing_utils
 
+        mp_face_detection = mp.solutions.face_detection
+        face_detection = mp_face_detection.FaceDetection(min_detection_confidence=0.7)
+
         cap = cv2.VideoCapture(0)
         if not cap.isOpened():
             print("카메라를 열 수 없습니다.")
@@ -161,6 +175,9 @@ def track():
             rgb = cv2.cvtColor(frame, cv2.COLOR_BGR2RGB)
             result = hands.process(rgb)
 
+            face_results = face_detection.process(rgb)
+            overlay_face_with_emoji(frame, face_results)
+
             if result.multi_hand_landmarks:
                 for hand_landmarks in result.multi_hand_landmarks:
                     # 이전 제스처가 포인팅이었는지 확인
@@ -195,6 +212,7 @@ def track():
                     # 인식된 제스처 기록 (마지막 제스처 업데이트)
                     if gesture:
                         last_gesture = gesture
+                        last_active = time.time()
 
                     # 손 랜드마크 연결선 시각화
                     mp_drawing.draw_landmarks(frame, hand_landmarks, mp_hands.HAND_CONNECTIONS)

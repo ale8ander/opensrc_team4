@@ -6,7 +6,7 @@ import cv2
 instructions = {
         "Victory": "Close Tab",
         "Fist": "Refresh",
-        "Open Hand": "Go Back",,
+        "Open Hand": "Go Back",
         "Thumb Up": "Quit"
         "Pointing": "Ready to Swipe",
         "Swipe Right": "Next Tab",
@@ -104,10 +104,12 @@ def classify_gesture(landmarks, trajectory, last_gesture=None):
             if abs(dy) > 60 and abs(dy) > abs(dx):
                 return "Scroll Down" if dy > 0 else "Scroll Up"
         return "Pointing"
+
     # Add Thumb Up gesture detection
-    elif thumb_extended and finger_count == 0:
+    if thumb_extended and finger_count == 0:
         return "Thumb Up"
-    elif finger_count == 0:
+
+    if finger_count == 0:
         return "Fist"
     elif finger_count >= 4 and thumb_extended:
         return "Open Hand"
@@ -244,6 +246,7 @@ def should_update_gesture(gesture_timestamp, hold_duration):
     return cooldown_remaining <= 0
 
 
+
 def process_hand_gesture(hand_landmarks, trajectory, gesture_timestamp, hold_duration, os_name, last_gesture=None):
     """
     Determine the gesture from current hand data and handle cooldown logic.
@@ -254,6 +257,7 @@ def process_hand_gesture(hand_landmarks, trajectory, gesture_timestamp, hold_dur
         gesture_timestamp (float): Timestamp of last gesture recognition.
         hold_duration (float): Cooldown duration in seconds.
         os_name (int): OS identifier (1: Windows, 0: macOS, -1: others)
+
         last_gesture (str, optional): The last recognized gesture. Defaults to None.
 
     Returns:
