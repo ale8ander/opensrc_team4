@@ -12,12 +12,6 @@ from gesture_core import (
     process_hand_gesture,
     update_fingertip_trajectory
 )
-from my_gui import (
-    show_guidline,
-    check_user_inactivity,
-    draw_quit_button,
-    show_intro_image
-)
 
 from my_gui import (
     show_guidline,
@@ -238,6 +232,15 @@ def track():
             if cooldown_remaining > 0:
                 cooldown_timer_text = f"Cooldown: {cooldown_remaining:.1f}s"
                 cv2.putText(frame, cooldown_timer_text, (50, 200), cv2.FONT_HERSHEY_SIMPLEX, 1.0, (255, 255, 0), 2)
+                total_bar_length = 300
+                filled_length = int((cooldown_remaining / GESTURE_HOLD_DURATION) * total_bar_length)
+
+                bar_x, bar_y = 50, 230
+                bar_height = 20
+
+                cv2.rectangle(frame, (bar_x, bar_y), (bar_x + total_bar_length, bar_y + bar_height), (100, 100, 100), -1)
+                cv2.rectangle(frame, (bar_x, bar_y), (bar_x + filled_length, bar_y + bar_height), (255, 255, 0), -1)
+                cv2.rectangle(frame, (bar_x, bar_y), (bar_x + total_bar_length, bar_y + bar_height), (255, 255, 255), 2)
 
             show_guidline(frame)
                     

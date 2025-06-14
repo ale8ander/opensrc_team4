@@ -45,7 +45,19 @@ def check_user_inactivity(frame, last_active, USER_INACTIVITY_TIME):
     now = time.time()
     # Display remaining time until inactivity if still active
     remaining_time = max(0, USER_INACTIVITY_TIME - (now - last_active))
-    cv2.putText(frame, f"Inactive in: {remaining_time:.1f}s", (50, 250), cv2.FONT_HERSHEY_SIMPLEX, 0.9, (100, 255, 255), 2)
+
+    if now - last_active <= USER_INACTIVITY_TIME:
+        cv2.putText(frame, f"Inactive in: {remaining_time:.1f}s", (50, 300), cv2.FONT_HERSHEY_SIMPLEX, 0.9, (100, 255, 255), 2)
+
+        total_bar_length = 300
+        filled_length = int((remaining_time / USER_INACTIVITY_TIME) * total_bar_length)
+
+        bar_x, bar_y = 50, 330
+        bar_height = 20
+
+        cv2.rectangle(frame, (bar_x, bar_y), (bar_x + total_bar_length, bar_y + bar_height), (100, 100, 100), -1)
+        cv2.rectangle(frame, (bar_x, bar_y), (bar_x + filled_length, bar_y + bar_height), (100, 255, 255), -1)
+        cv2.rectangle(frame, (bar_x, bar_y), (bar_x + total_bar_length, bar_y + bar_height), (255, 255, 255), 2)
 
     if now - last_active > USER_INACTIVITY_TIME:
         h, w, _ = frame.shape
