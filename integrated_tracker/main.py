@@ -30,7 +30,7 @@ from emoji import (
 MAX_TRAJECTORY_LENGTH = 20
 GESTURE_HOLD_DURATION = 3
 SEND_INTERVAL = 0.5
-USER_INACTIVITY_TIME = 10
+USER_INACTIVITY_TIME = 60 # ALSO CHANGED THE INACTIVITY TIME. Sinct i
 
 
 # 운영체제 확인
@@ -97,16 +97,19 @@ def track():
 
     # macOS 권한 체크 경고 (권한 없을 경우만 출력)
     if os_name == 0:
-        test_cam = cv2.VideoCapture(0)
+        test_cam = cv2.VideoCapture(0) # Try default webcam (index 0)
+        if not test_cam.isOpened():
+            test_cam = cv2.VideoCapture(1) # Fallback to secondary webcam (index 1)
         if not test_cam.isOpened():
             print("\n[Permission Warning]")
             print("웹캠 권한이 macOS에서 차단되어 있을 수 있습니다.")
             print("시스템 환경설정 > 보안 및 개인정보 보호 > 카메라에서 Python 또는 터미널 앱에 권한을 부여하세요.\n")
         test_cam.release()
+
     
     #intro show
     show_intro_image("../icon/start.jpg")
-    
+        
     # MediaPipe 및 카메라 초기화
     mp_hands = mp.solutions.hands
     hands = None
@@ -119,13 +122,18 @@ def track():
         mp_face_detection = mp.solutions.face_detection
         face_detection = mp_face_detection.FaceDetection(min_detection_confidence=0.7)
 
+        # ✅ Try default camera first, fallback to index 1 if failed
         cap = cv2.VideoCapture(0)
         if not cap.isOpened():
-            print("카메라를 열 수 없습니다.")
+            print("[Info] 기본 카메라(0) 열기 실패, 카메라 1 시도 중...")
+            cap = cv2.VideoCapture(1)
+
+        if not cap.isOpened():
+            print("카메라를 열 수 없습니다. 연결된 장치를 확인하세요.")
             return
 
         cv2.namedWindow("Hand Gesture Tracking", cv2.WINDOW_NORMAL)
-        
+
         # 제스처 인식 상태 초기화
         trajectory = deque(maxlen=MAX_TRAJECTORY_LENGTH) # 손 이동 궤적 저장용
         swipe_recognizer = SwipeRecognizer()
