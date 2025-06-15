@@ -6,24 +6,34 @@ from gesture_core import instructions
 # 경로 설정
 # BASE_DIR = os.path.dirname(os.path.abspath(__file__))
 
-
-# 화면 우측 가이드 라인 제공
 def show_guidline(frame):
+    """
+    화면 우측에 제스처 가이드를 텍스트로 출력합니다.
+    """
     frame_width = frame.shape[1]
-    
-    for i, (gesture_name, description) in enumerate(instructions.items()):
-        line = f"{gesture_name}: {description}"
-        text_size, _ = cv2.getTextSize(line, cv2.FONT_HERSHEY_SIMPLEX, 1.0, 2)
+
+    # 출력할 전체 텍스트
+    guideline_lines = [
+        "<Guideline>",
+        "Victory: Close Tab",
+        "Fist: Refresh",
+        "Open Hand: Go Back",
+        "Thumb Up: Quit",
+        "Pointing + Swipe Right: Next Tab",
+        "Pointing + Swipe Left: Previous Tab",
+        "Scroll Up: Scroll Up",
+        "Scroll Down: Scroll Down"
+    ]
+
+    # 텍스트 출력
+    for i, line in enumerate(guideline_lines):
+        font_scale = 1.2 if i == 0 else 0.9
+        font_thickness = 2
+        text_size, _ = cv2.getTextSize(line, cv2.FONT_HERSHEY_SIMPLEX, font_scale, font_thickness)
         text_width = text_size[0]
-        x = frame_width - text_width - 70
-        y = 30 + (i + 1) * 30
-        if i == 0:
-            header = "<Guideline>"
-            header_size, _ = cv2.getTextSize(header, cv2.FONT_HERSHEY_SIMPLEX, 1.2, 2)
-            header_width = header_size[0]
-            header_x = frame_width - header_width - 70
-            cv2.putText(frame, header, (header_x, 30 + i * 30), cv2.FONT_HERSHEY_SIMPLEX, 1.2, (0, 255, 0), 2)
-        cv2.putText(frame, line, (x, y), cv2.FONT_HERSHEY_SIMPLEX, 1.2, (0, 255, 0), 2)
+        x = frame_width - text_width - 30
+        y = 50 + i * 35
+        cv2.putText(frame, line, (x, y), cv2.FONT_HERSHEY_SIMPLEX, font_scale, (0, 255, 0), font_thickness)
 
 def check_user_inactivity(frame, last_active, USER_INACTIVITY_TIME):
     """

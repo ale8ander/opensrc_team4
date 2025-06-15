@@ -231,7 +231,7 @@ def track():
 
             # 결과 화면 출력
             if gesture:
-                frame = overlay_png(frame, gesture, 300, 150)
+                frame = overlay_png(frame, gesture, 50, 400)
                 cv2.putText(frame, gesture, (50, 60), cv2.FONT_HERSHEY_SIMPLEX, 1.2, (0, 0, 255), 2)
                 description = instructions.get(gesture, "")
                 cv2.putText(frame, description, (50, 110), cv2.FONT_HERSHEY_SIMPLEX, 1.2, (0, 255, 0), 2)

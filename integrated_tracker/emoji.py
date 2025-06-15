@@ -7,7 +7,8 @@ emoji_img_paths = {
     "Swipe Left": os.path.join(BASE_DIR, "emojis/swipe_left.png"),
     "Fist": os.path.join(BASE_DIR, "emojis/fist.png"),
     "Open Hand": os.path.join(BASE_DIR, "emojis/open_hand.png"),
-    "Victory": os.path.join(BASE_DIR, "emojis/victory.png")
+    "Victory": os.path.join(BASE_DIR, "emojis/victory.png"),
+    "Thumb Up": os.path.join(BASE_DIR, "emojis/thumb_up.png")
 }
 
 emoji_cache = {
@@ -90,8 +91,14 @@ def overlay_face_with_emoji(frame, face_detections):
             w = int(bboxC.width * iw)
             h = int(bboxC.height * ih)
 
-            x2 = min(iw, x + w)
-            y2 = min(ih, y + h)
+            # 얼굴보다 1.2배 더 크게
+            scale = 1.2
+            new_w = int(w * scale)
+            new_h = int(h * scale)
+            x = max(0, x - (new_w - w) // 2)
+            y = max(0, y - (new_h - h) // 2)
+            x2 = min(iw, x + new_w)
+            y2 = min(ih, y + new_h)
 
             # emoji 합성
             face_img_path = os.path.join(BASE_DIR, "emojis/kissing.png")
