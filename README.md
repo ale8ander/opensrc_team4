@@ -4,8 +4,7 @@
 *For planned features and progress, please refer to [ROADMAP.md](./docs/ROADMAP.md).*
 <div align="center">
 
-![project Team Logo](./icon/start.jpg)
-<img src="./icon/start.jpg" style="width:300px; height:auto;">
+<img src="./icon/start.jpg" style="width:1000px; height:auto;">
 
 </div>
 
@@ -24,8 +23,9 @@
 ## Overview
 
 ### Screen Layout
+<img src="https://github.com/user-attachments/assets/3d5421eb-e5cf-45d9-8189-fd45ac33e11e" style="width:1000px; height:auto;">
 
-<img width="639" alt="screen_layout" src="https://github.com/user-attachments/assets/3d5421eb-e5cf-45d9-8189-fd45ac33e11e" />
+---
 
 ### Installation Guide
 
