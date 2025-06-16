@@ -1,4 +1,4 @@
-# Open Source Contribution Project - Team 4
+<img width="639" alt="screen_layout" src="https://github.com/user-attachments/assets/21d5d9f5-2f63-4d38-bb2b-f250394a9754" /># Open Source Contribution Project - Team 4
 
 ### Hand Gesture Controller
 
@@ -23,6 +23,10 @@
 ---
 
 ## Overview
+
+### Screen Layout
+
+<img width="639" alt="screen_layout" src="https://github.com/user-attachments/assets/3d5421eb-e5cf-45d9-8189-fd45ac33e11e" />
 
 ### Installation Guide
 
