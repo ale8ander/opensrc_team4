@@ -5,6 +5,7 @@
 <div align="center">
 
 ![project Team Logo](./icon/start.jpg)
+<img src="./icon/start.jpg" style="width:300px; height:auto;">
 
 </div>
 
