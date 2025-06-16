@@ -6,7 +6,7 @@
 *For planned features and progress, please refer to [ROADMAP.md](./docs/ROADMAP.md).*
 <div align="center">
 
-![project Team Logo](./icon/start.jpg){: width="30%" height="30%"}
+![project Team Logo](./icon/start.jpg)
 
 </div>
 
