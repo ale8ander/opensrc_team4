@@ -1,5 +1,3 @@
-<img width="639" alt="screen_layout" src="https://github.com/user-attachments/assets/21d5d9f5-2f63-4d38-bb2b-f250394a9754" /># Open Source Contribution Project - Team 4
-
 ### Hand Gesture Controller
 
 **This repository provides an OpenCV-based multi-remote control using hand gesture recognition.**
